@@ -3,26 +3,13 @@ import Tock from 'tocktimer';
 
 class Timer extends React.Component {
 
-	render() {
-		return (
-			<div>
-				<div>{this.state.time}</div>
-				<button onClick={() => this.toggleTimer()}>{this.state.buttonText}</button>
-			</div>
-		);
-	}
-
-	updateTimer() {
-		var timer = this.state.tock;
-		this.setState({time: timer.msToTimecode(timer.lap())})
-	}
-
 	constructor(props) {
 		super(props);
 		this.toggleTimer = this.toggleTimer.bind(this);
 		this.updateTimer = this.updateTimer.bind(this);
+		this._removeTimer = this._removeTimer.bind(this);
 		this.state = {
-			time: 0,
+			time: "00:00:00",
 			tock: new Tock({
 				callback: this.updateTimer
 			}),
@@ -31,6 +18,31 @@ class Timer extends React.Component {
 			hasPreviouslyStarted: false
 		};
 	}
+
+	render() {
+		return (
+			<div>
+				<div onClick={this.props.showTimerEditModal(this.state.time)}>{this.state.time}</div>
+				<button onClick={this.toggleTimer}>{this.state.buttonText}</button>
+				<button onClick={this.showTimeEditor}>Edit</button>
+				<button onClick={this._removeTimer}>Remove Timer</button>
+			</div>
+		);
+	}
+
+	_removeTimer() {
+		this.props.removeTimer(this.props.itemID);
+	}
+
+	showTimeEditor() {
+
+	}
+
+	updateTimer() {
+		var timer = this.state.tock;
+		this.setState({time: timer.msToTimecode(timer.lap())})
+	}
+
 
 	toggleTimer() {
 		if(!this.state.timerRunning) {
@@ -47,6 +59,14 @@ class Timer extends React.Component {
 			timerRunning: !this.state.timerRunning,
 			hasPreviouslyStarted: true
 		});
+	}
+
+	ensureTimerRunning() {
+
+	}
+
+	ensureTimerNotRunning() {
+
 	}
 
 }
