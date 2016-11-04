@@ -17,8 +17,8 @@ class Timer extends React.Component {
 		this.setState({time: timer.msToTimecode(timer.lap())})
 	}
 
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 		this.toggleTimer = this.toggleTimer.bind(this);
 		this.updateTimer = this.updateTimer.bind(this);
 		this.state = {

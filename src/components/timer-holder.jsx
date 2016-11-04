@@ -5,8 +5,8 @@ import TimerTotals from './timer-totals.jsx';
 
 class TimerHolder extends React.Component {
 
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 		this.addTimer = this.addTimer.bind(this);
 		this.state = {
 			timers: []
@@ -17,17 +17,18 @@ class TimerHolder extends React.Component {
 		return (
 			<div>
 				<div>
-					this.state.timers.map(() => return "<Timer />")
-				<div>
-				<TimerControls addTimer={() => this.addTimer()} />
+					{this.state.timers.map(()=><Timer />);}
+				</div>
+				<TimerControls addTimer={this.addTimer.bind(this)} />
 				<TimerTotals />
 			</div>
 		);
 	}
 
 	addTimer() {
-		var rawr = this.state.timers.push(timers.length);
-		this.setState({timers: rawr});
+		let newTimers = this.state.timers;
+		newTimers.push(this.state.timers.length);
+		this.setState({timers: newTimers});
 	}
 }
 
