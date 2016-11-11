@@ -1,8 +1,8 @@
 let nextTaskId = 0
-export const addTask = (text) => ({
+export const addTask = (task) => ({
     type: 'ADD_TASK',
-    id: nextTaskId++,
-    text
+    // id: nextTaskId++,
+    payload: task
 })
 
 export const setVisibilityFilter = (filter) => ({

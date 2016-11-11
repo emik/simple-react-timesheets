@@ -1,6 +1,10 @@
-// const initialState = {
-
-// };
+const initialState = [
+	{ description: 'blagh', time: '00:00:00' },
+	{ description: 'asdvasdv', time: '00:00:00' },
+	{ description: 'avdssvawe', time: '00:00:00' },
+	{ description: 'blfadsagh', time: '00:00:00' },
+	{ description: 'blagh', time: '00:00:00' },
+];
 
 
 // function taskApp(state = initialState, action) {
@@ -25,12 +29,18 @@
 //  return state
 // }
 
-export default () => {
-    return [
-        { description: 'blagh', time: '00:00:00' },
-        { description: 'asdvasdv', time: '00:00:00' },
-        { description: 'avdssvawe', time: '00:00:00' },
-        { description: 'blfadsagh', time: '00:00:00' },
-        { description: 'blagh', time: '00:00:00' },
-    ];
+function TasksReducer(state = initialState, action) {
+	switch(action.type) {
+		case 'ADD_TASK':
+			return Object.assign({}, state, {
+				tasks: [
+					...state.tasks,
+					action.payload
+				]
+			});
+			break;
+	}
+	return state;
 };
+
+export default TasksReducer;
