@@ -1,3 +1,6 @@
+export const ADD_TASK = 'ADD_TASK';
+export const REMOVE_TASK = 'REMOVE_TASK';
+
 function TasksReducer(state, action) {
     if(state === undefined) {
         state = [
@@ -9,7 +12,7 @@ function TasksReducer(state, action) {
         ];
     }
     switch(action.type) {
-        case 'ADD_TASK':
+        case ADD_TASK:
             return [
                 ...state,
                 {
@@ -20,7 +23,7 @@ function TasksReducer(state, action) {
                 }
             ];
             break;
-        case 'REMOVE_TASK':
+        case REMOVE_TASK:
             return state.filter(task => task.key !== action.taskKey);
             break;
 

@@ -1,15 +1,15 @@
-let nextTaskId = 0
+import { ADD_TASK, REMOVE_TASK } from '../reducers/reducer-tasks.jsx';
+
 export function addTask(task) {
     return {
-        type: 'ADD_TASK',
-        // id: nextTaskId++,
+        type: ADD_TASK,
         payload: task
     };
 }
 
 export function removeTask(taskKey) {
     return {
-        type: 'REMOVE_TASK',
+        type: REMOVE_TASK,
         taskKey: taskKey
     };
 }
