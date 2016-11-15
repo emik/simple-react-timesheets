@@ -1,46 +1,31 @@
-const initialState = [
-	{ description: 'blagh', time: '00:00:00' },
-	{ description: 'asdvasdv', time: '00:00:00' },
-	{ description: 'avdssvawe', time: '00:00:00' },
-	{ description: 'blfadsagh', time: '00:00:00' },
-	{ description: 'blagh', time: '00:00:00' },
-];
+function TasksReducer(state, action) {
+    if(state === undefined) {
+        state = [
+            { description: 'blagh', time: '00:00:00', key: 0 },
+            { description: 'asdvasdv', time: '00:00:00', key: 1 },
+            { description: 'avdssvawe', time: '00:00:00', key: 2 },
+            { description: 'blfadsagh', time: '00:00:00', key: 3 },
+            { description: 'blagh', time: '00:00:00', key: 4 },
+        ];
+    }
+    switch(action.type) {
+        case 'ADD_TASK':
+            return [
+                ...state,
+                {
+                    // reduce to get the max key in task list, then add 1 to add to array
+                    key: state.reduce((prevMaxKey, curTask) => Math.max(prevMaxKey > 0 ? prevMaxKey : 0, curTask.key)) + 1,
+                    description: 'wooo',
+                    time: '00:00:00'
+                }
+            ];
+            break;
+        case 'REMOVE_TASK':
+            return state.filter(task => task.key !== action.taskKey);
+            break;
 
-
-// function taskApp(state = initialState, action) {
-//  switch (action.type) {
-//      case 'ADD_TASK':
-//          return Object.assign({}, state, {
-//              tasks: [
-//                  ...state.tasks,
-//                  {
-//                      text: action.text
-//                  }
-//              ]
-//          });
-//      case 'REMOVE_TASK':
-//          var tasks = tasks.filter((tasks) => tasks.index !== action.index);
-//          return Object.assign({}, state, {
-//              tasks: tasks
-//          });
-//      default:
-//          return state
-//  }
-//  return state
-// }
-
-function TasksReducer(state = initialState, action) {
-	switch(action.type) {
-		case 'ADD_TASK':
-			return Object.assign({}, state, {
-				tasks: [
-					...state.tasks,
-					action.payload
-				]
-			});
-			break;
-	}
-	return state;
+    }
+    return state;
 };
 
 export default TasksReducer;

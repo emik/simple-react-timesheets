@@ -7,7 +7,7 @@ class Task extends React.Component {
         super(props);
         this.toggleTask = this.toggleTask.bind(this);
         this.updateTask = this.updateTask.bind(this);
-        this._removeTask = this._removeTask.bind(this);
+        this._removeTaskInner = this._removeTaskInner.bind(this);
         this.state = {
             time: "00:00:00",
             tock: new Tock({
@@ -22,16 +22,17 @@ class Task extends React.Component {
     render() {
         return (
             <div>
+                <h2>{this.props.description}</h2>
                 <div onClick={this.props.showTaskEditModal(this.state.time)}>{this.state.time}</div>
                 <button onClick={this.toggleTask}>{this.state.buttonText}</button>
                 <button onClick={this.showTaskEditor}>Edit</button>
-                <button onClick={this._removeTask}>Remove Task</button>
+                <button onClick={this._removeTaskInner}>Remove Task</button>
             </div>
         );
     }
 
-    _removeTask() {
-        this.props.removeTask(this.props.itemID);
+    _removeTaskInner() {
+        this.props._removeTask(this.props.itemID);
     }
 
     showTaskEditor() {

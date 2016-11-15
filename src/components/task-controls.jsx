@@ -9,7 +9,7 @@ class TaskControls extends React.Component {
     render() {
         return (
             <div>
-                <button onClick={this.props.addTask}>Add Task</button>
+                <button onClick={this.props._addTask}>Add Task</button>
             </div>
         );
     }
