@@ -6,12 +6,12 @@ class Task extends React.Component {
     constructor(props) {
         super(props);
         this.toggleTask = this.toggleTask.bind(this);
-        this.updateVisualTime = this.updateVisualTime.bind(this);
+        this._updateTimeInner = this._updateTimeInner.bind(this);
         this._removeTaskInner = this._removeTaskInner.bind(this);
+        this._showTaskEditor = this._showTaskEditor.bind(this);
         this.state = {
-            time: this.props.time,
             tock: new Tock({
-                callback: this.updateVisualTime
+                callback: this._updateTimeInner
             }),
             timerRunning: false,
             buttonText: 'Start',
@@ -23,9 +23,9 @@ class Task extends React.Component {
         return (
             <div>
                 <h2>{this.props.description}</h2>
-                <div onClick={this.props.showTaskEditModal(this.state.time)}>{this.state.time}</div>
+                <div>{this.props.time}</div>
                 <button onClick={this.toggleTask}>{this.state.buttonText}</button>
-                <button onClick={this.showTaskEditor}>Edit</button>
+                <button onClick={this._showTaskEditor}>Edit</button>
                 <button onClick={this._removeTaskInner}>Remove Task</button>
             </div>
         );
@@ -35,15 +35,16 @@ class Task extends React.Component {
         this.props._removeTask(this.props.itemID);
     }
 
-    showTaskEditor() {
-
+    _showTaskEditor() {
+        this.ensureTimerNotRunning();
+        this.props.showTaskEditor(this.props.itemID);
     }
 
-    updateVisualTime() {
-        var task = this.state.tock;
-        this.setState({time: task.msToTimecode(task.lap())})
+    _updateTimeInner() {
+        let task = this.state.tock;
+        let newTime = task.msToTimecode(task.lap());
+        this.props._updateTime(this.props.itemID, newTime);
     }
-
 
     toggleTask() {
         if(!this.state.timerRunning) {
@@ -62,11 +63,12 @@ class Task extends React.Component {
         });
     }
 
-    ensureTaskRunning() {
+    ensureTimerRunning() {
 
     }
 
-    ensureTaskNotRunning() {
+    // TODO
+    ensureTimerNotRunning() {
 
     }
 
