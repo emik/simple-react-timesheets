@@ -6,12 +6,12 @@ class Task extends React.Component {
     constructor(props) {
         super(props);
         this.toggleTask = this.toggleTask.bind(this);
-        this.updateTask = this.updateTask.bind(this);
+        this.updateVisualTime = this.updateVisualTime.bind(this);
         this._removeTaskInner = this._removeTaskInner.bind(this);
         this.state = {
-            time: "00:00:00",
+            time: this.props.time,
             tock: new Tock({
-                callback: this.updateTask
+                callback: this.updateVisualTime
             }),
             timerRunning: false,
             buttonText: 'Start',
@@ -39,7 +39,7 @@ class Task extends React.Component {
 
     }
 
-    updateTask() {
+    updateVisualTime() {
         var task = this.state.tock;
         this.setState({time: task.msToTimecode(task.lap())})
     }

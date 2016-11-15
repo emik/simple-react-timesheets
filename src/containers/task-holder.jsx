@@ -33,6 +33,7 @@ class TaskHolder extends React.Component {
                         showTaskEditModal={this.showTaskEditModal} 
                         _removeTask={this._removeTask} 
                         description={task.description}
+                        time={task.time}
                         key={task.key}
                         itemID={task.key}
                     />
