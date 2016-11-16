@@ -9,9 +9,11 @@ class Task extends React.Component {
         this._updateTimeInner = this._updateTimeInner.bind(this);
         this._removeTaskInner = this._removeTaskInner.bind(this);
         this._showTaskEditor = this._showTaskEditor.bind(this);
+        this.updateTockToTime = this.updateTockToTime.bind(this);
         this.state = {
             tock: new Tock({
-                callback: this._updateTimeInner
+                callback: this._updateTimeInner,
+                interval: 1000
             }),
             timerRunning: false,
             buttonText: 'Start',
@@ -48,19 +50,19 @@ class Task extends React.Component {
 
     toggleTask() {
         if(!this.state.timerRunning) {
-            if(this.state.hasPreviouslyStarted) {
-                this.state.tock.pause(); // unpauses
-            }else {
-                this.state.tock.start();
-            }
+            this.state.tock.start(this.props.time);
         }else {
-            this.state.tock.pause();
+            this.state.tock.pause(); // can unpause so be careful with this method
         }
         this.setState({
             buttonText: this.state.timerRunning ? 'Start' : 'Stop',
             timerRunning: !this.state.timerRunning,
             hasPreviouslyStarted: true
         });
+    }
+
+    updateTockToTime(time) {
+
     }
 
     ensureTimerRunning() {

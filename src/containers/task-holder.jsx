@@ -9,7 +9,6 @@ import TaskControls from '../components/task-controls.jsx';
 import TaskTotals from '../components/task-totals.jsx';
 import TaskEditModal from '../components/task-edit-modal.jsx';
 
-
 class TaskHolder extends React.Component {
 
     constructor(props) {
