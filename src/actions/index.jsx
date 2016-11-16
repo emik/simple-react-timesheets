@@ -1,4 +1,4 @@
-import { ADD_TASK, REMOVE_TASK, EDIT_TASK, UPDATE_TIME } from '../reducers/reducer-tasks.jsx';
+import { ADD_TASK, REMOVE_TASK, EDIT_TASK, UPDATE_TIME, SET_ACTIVE_TASK, SET_INACTIVE_TASK } from '../reducers/reducer-tasks.jsx';
 
 export function addTask(task) {
     return {
@@ -26,5 +26,19 @@ export function updateTime(taskKey, newTime) {
         type: UPDATE_TIME,
         taskKey: taskKey,
         newTime: newTime
+    };
+}
+
+export function setActiveTask(taskKey) {
+    return {
+        type: SET_ACTIVE_TASK,
+        taskKey: taskKey
+    };
+}
+
+export function setInactiveTask(taskKey) {
+    return {
+        type: SET_INACTIVE_TASK,
+        taskKey: taskKey
     };
 }

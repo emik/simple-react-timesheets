@@ -8,15 +8,24 @@ class Task extends React.Component {
         this.toggleTimer = this.toggleTimer.bind(this);
         this._updateTimeInner = this._updateTimeInner.bind(this);
         this._removeTaskInner = this._removeTaskInner.bind(this);
+        this._setActiveTaskInner = this._setActiveTaskInner.bind(this);
+        this._setInactiveTaskInner = this._setInactiveTaskInner.bind(this);
         this._showTaskEditor = this._showTaskEditor.bind(this);
-        this.state = {
-            tock: new Tock({
-                callback: this._updateTimeInner,
-                interval: 1000
-            }),
-            timerRunning: false,
-            buttonText: 'Start'
-        };
+        this.startTimer = this.startTimer.bind(this);
+        this.stopTimer = this.stopTimer.bind(this);
+        this.startTock = this.startTock.bind(this);
+        this.state = Object.assign({
+                tock: new Tock({
+                    callback: this._updateTimeInner,
+                    interval: 1000
+                })
+            },
+            this.constructTimerState(this.props.active)
+        );
+
+        if(this.props.active) {
+            this.startTock();
+        }
     }
 
     render() {
@@ -36,38 +45,55 @@ class Task extends React.Component {
     }
 
     _showTaskEditor() {
-        this.ensureTimerNotRunning();
+        this.stopTimer();
         this.props.showTaskEditor(this.props.itemID);
     }
 
     _updateTimeInner() {
-        let task = this.state.tock;
-        let newTime = task.msToTimecode(task.lap());
+        let tockObj = this.state.tock;
+        let newTime = tockObj.msToTimecode(tockObj.lap());
         this.props._updateTime(this.props.itemID, newTime);
+    }
+
+    _setActiveTaskInner() {
+        this.props._setActiveTask(this.props.itemID);
+    }
+
+    _setInactiveTaskInner() {
+        this.props._setInactiveTask(this.props.itemID);
     }
 
     toggleTimer() {
         if(!this.state.timerRunning) {
-            this.state.tock.start(this.props.time);
+            this.startTimer()
         }else {
-            this.state.tock.pause(); // can unpause so be careful with this method
-        }
-        this.setState({
-            buttonText: this.state.timerRunning ? 'Start' : 'Stop',
-            timerRunning: !this.state.timerRunning
-        });
-    }
-
-    ensureTimerRunning() {
-        if(!this.state.timerRunning) {
-            this.state.tock.start(this.props.time);
+            this.stopTimer();
         }
     }
 
-    ensureTimerNotRunning() {
+    startTock() {
+        this.state.tock.start(this.props.time);
+    }
+
+    startTimer() {
+        this.startTock();
+        this.setState(this.constructTimerState(true));
+    }
+
+    stopTimer() {
+        // needs check for safety cos .pause can unpause
         if(this.state.timerRunning) {
             this.state.tock.pause();
         }
+        this.setState(this.constructTimerState(false));
+    }
+
+    // necessary for injection into initial constructor state before component is mounted
+    constructTimerState(timerIsOn) {
+        return {
+            buttonText: timerIsOn ? 'Stop' : 'Start',
+            timerRunning: timerIsOn
+        };
     }
 
 }

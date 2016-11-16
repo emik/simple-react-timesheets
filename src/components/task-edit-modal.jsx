@@ -24,8 +24,8 @@ class TaskEditModal extends React.Component {
                     <label htmlFor="time">Time</label>
                     <input type="text" name="time" id="time" value={this.state.time} onChange={this.handleTimeChange} />
                 </div>
-                <button onClick={this.props.hideTaskEditor}>Close</button>
                 <button>Apply</button>
+                <button onClick={this.props.hideTaskEditor}>Close</button>
             </form>
         );
     }
@@ -44,6 +44,7 @@ class TaskEditModal extends React.Component {
 
     _applyEditsInner(event) {
         event.preventDefault();
+        console.log("FORM SUBMIT");
         let editedTask = Object.assign({}, this.props.currentEditingTask, {
             description: this.state.description,
             time: this.state.time
