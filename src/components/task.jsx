@@ -9,7 +9,6 @@ class Task extends React.Component {
         this._updateTimeInner = this._updateTimeInner.bind(this);
         this._removeTaskInner = this._removeTaskInner.bind(this);
         this._showTaskEditor = this._showTaskEditor.bind(this);
-        this.updateTockToTime = this.updateTockToTime.bind(this);
         this.state = {
             tock: new Tock({
                 callback: this._updateTimeInner,
@@ -59,10 +58,6 @@ class Task extends React.Component {
             timerRunning: !this.state.timerRunning,
             hasPreviouslyStarted: true
         });
-    }
-
-    updateTockToTime(time) {
-
     }
 
     ensureTimerRunning() {
