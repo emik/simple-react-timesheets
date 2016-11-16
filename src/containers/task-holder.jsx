@@ -41,6 +41,8 @@ class TaskHolder extends React.Component {
                         key={task.key}
                         itemID={task.key}
                         active={task.active}
+                        _setActiveTask={this._setActiveTask}
+                        _setInactiveTask={this._setInactiveTask}
                     />
                 );
             }

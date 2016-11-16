@@ -17,7 +17,7 @@ class Task extends React.Component {
         this.state = Object.assign({
                 tock: new Tock({
                     callback: this._updateTimeInner,
-                    interval: 1000
+                    interval: 10
                 })
             },
             this.constructTimerState(this.props.active)
@@ -50,9 +50,13 @@ class Task extends React.Component {
     }
 
     _updateTimeInner() {
-        let tockObj = this.state.tock;
-        let newTime = tockObj.msToTimecode(tockObj.lap());
-        this.props._updateTime(this.props.itemID, newTime);
+        if(this.props.active) {
+            let tockObj = this.state.tock;
+            let newTime = tockObj.msToTimecode(tockObj.lap());
+            this.props._updateTime(this.props.itemID, newTime);
+        } else {
+            this.stopTimer();
+        }
     }
 
     _setActiveTaskInner() {
@@ -77,6 +81,7 @@ class Task extends React.Component {
 
     startTimer() {
         this.startTock();
+        this._setActiveTaskInner();
         this.setState(this.constructTimerState(true));
     }
 
@@ -85,6 +90,7 @@ class Task extends React.Component {
         if(this.state.timerRunning) {
             this.state.tock.pause();
         }
+        this._setInactiveTaskInner();
         this.setState(this.constructTimerState(false));
     }
 
