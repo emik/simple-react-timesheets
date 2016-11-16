@@ -15,8 +15,7 @@ class Task extends React.Component {
                 interval: 1000
             }),
             timerRunning: false,
-            buttonText: 'Start',
-            hasPreviouslyStarted: false
+            buttonText: 'Start'
         };
     }
 
@@ -55,8 +54,7 @@ class Task extends React.Component {
         }
         this.setState({
             buttonText: this.state.timerRunning ? 'Start' : 'Stop',
-            timerRunning: !this.state.timerRunning,
-            hasPreviouslyStarted: true
+            timerRunning: !this.state.timerRunning
         });
     }
 
