@@ -5,7 +5,7 @@ class Task extends React.Component {
 
     constructor(props) {
         super(props);
-        this.toggleTask = this.toggleTask.bind(this);
+        this.toggleTimer = this.toggleTimer.bind(this);
         this._updateTimeInner = this._updateTimeInner.bind(this);
         this._removeTaskInner = this._removeTaskInner.bind(this);
         this._showTaskEditor = this._showTaskEditor.bind(this);
@@ -25,7 +25,7 @@ class Task extends React.Component {
             <div>
                 <h2>{this.props.description}</h2>
                 <div>{this.props.time}</div>
-                <button onClick={this.toggleTask}>{this.state.buttonText}</button>
+                <button onClick={this.toggleTimer}>{this.state.buttonText}</button>
                 <button onClick={this._showTaskEditor}>Edit</button>
                 <button onClick={this._removeTaskInner}>Remove Task</button>
             </div>
@@ -47,7 +47,7 @@ class Task extends React.Component {
         this.props._updateTime(this.props.itemID, newTime);
     }
 
-    toggleTask() {
+    toggleTimer() {
         if(!this.state.timerRunning) {
             this.state.tock.start(this.props.time);
         }else {
@@ -61,12 +61,15 @@ class Task extends React.Component {
     }
 
     ensureTimerRunning() {
-
+        if(!this.state.timerRunning) {
+            this.state.tock.start(this.props.time);
+        }
     }
 
-    // TODO
     ensureTimerNotRunning() {
-
+        if(this.state.timerRunning) {
+            this.state.tock.pause();
+        }
     }
 
 }
