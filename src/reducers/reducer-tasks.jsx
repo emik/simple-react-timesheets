@@ -3,7 +3,7 @@ export const REMOVE_TASK = 'REMOVE_TASK';
 export const EDIT_TASK = 'EDIT_TASK';
 export const UPDATE_TIME = 'UPDATE_TIME';
 export const SET_ACTIVE_TASK = 'SET_ACTIVE_TASK';
-export const SET_INACTIVE_TASK = 'SET_INACTIVE_TASK';
+export const SET_TASKS_INACTIVE = 'SET_TASKS_INACTIVE';
 
 function TasksReducer(state, action) {
     if(state === undefined) {
@@ -15,7 +15,7 @@ function TasksReducer(state, action) {
             { description: 'blagh', time: '00:00:00', key: 4, active: false },
         ];
     }
-    console.log(action.type);
+    // console.log(action.type);
     switch(action.type) {
         case ADD_TASK:
             return [
@@ -59,14 +59,11 @@ function TasksReducer(state, action) {
                     active: false
                 });
             });
-        case SET_INACTIVE_TASK:
+        case SET_TASKS_INACTIVE:
             return state.map(task => {
-                if(task.key == action.taskKey) {
-                    return Object.assign({}, task, {
-                        active: false
-                    });
-                }
-                return task;
+                return Object.assign({}, task, {
+                    active: false
+                });
             });
     }
     return state;

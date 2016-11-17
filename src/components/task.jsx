@@ -9,30 +9,40 @@ class Task extends React.Component {
         this._updateTimeInner = this._updateTimeInner.bind(this);
         this._removeTaskInner = this._removeTaskInner.bind(this);
         this._setActiveTaskInner = this._setActiveTaskInner.bind(this);
-        this._setInactiveTaskInner = this._setInactiveTaskInner.bind(this);
+        this._setTasksInactiveInner = this._setTasksInactiveInner.bind(this);
         this._showTaskEditor = this._showTaskEditor.bind(this);
+        this._showTaskEditorSelectDescription = this._showTaskEditorSelectDescription.bind(this);
+        this._showTaskEditorSelectTime = this._showTaskEditorSelectTime.bind(this);
         this.startTimer = this.startTimer.bind(this);
         this.stopTimer = this.stopTimer.bind(this);
         this.startTock = this.startTock.bind(this);
         this.state = Object.assign({
                 tock: new Tock({
                     callback: this._updateTimeInner,
-                    interval: 10
-                })
-            },
-            this.constructTimerState(this.props.active)
+                    interval: 100
+                }),
+            }
         );
+    }
 
+    componentDidMount() {
         if(this.props.active) {
             this.startTock();
+        }
+        this.setState(this.constructTimerState(this.props.active));
+    }
+
+    componentWillReceiveProps(props) {
+        if(!props.active && this.state.timerRunning) {
+            this.stopTimer();
         }
     }
 
     render() {
         return (
             <div>
-                <h2>{this.props.description}</h2>
-                <div>{this.props.time}</div>
+                <h2 onClick={this._showTaskEditorSelectDescription}>{this.props.description}</h2>
+                <div onClick={this._showTaskEditorSelectTime}>{this.props.time}</div>
                 <button onClick={this.toggleTimer}>{this.state.buttonText}</button>
                 <button onClick={this._showTaskEditor}>Edit</button>
                 <button onClick={this._removeTaskInner}>Remove Task</button>
@@ -49,22 +59,27 @@ class Task extends React.Component {
         this.props.showTaskEditor(this.props.itemID);
     }
 
+    _showTaskEditorSelectDescription() {
+        this.stopTimer();
+        this.props.showTaskEditor(this.props.itemID, 'description')
+    }
+    _showTaskEditorSelectTime() {
+        this.stopTimer();
+        this.props.showTaskEditor(this.props.itemID, 'time')
+    }
+
     _updateTimeInner() {
-        if(this.props.active) {
-            let tockObj = this.state.tock;
-            let newTime = tockObj.msToTimecode(tockObj.lap());
-            this.props._updateTime(this.props.itemID, newTime);
-        } else {
-            this.stopTimer();
-        }
+        let tockObj = this.state.tock;
+        let newTime = tockObj.msToTimecode(tockObj.lap());
+        this.props._updateTime(this.props.itemID, newTime);
     }
 
     _setActiveTaskInner() {
         this.props._setActiveTask(this.props.itemID);
     }
 
-    _setInactiveTaskInner() {
-        this.props._setInactiveTask(this.props.itemID);
+    _setTasksInactiveInner() {
+        this.props._setTasksInactive(this.props.itemID);
     }
 
     toggleTimer() {
@@ -86,15 +101,11 @@ class Task extends React.Component {
     }
 
     stopTimer() {
-        // needs check for safety cos .pause can unpause
-        if(this.state.timerRunning) {
-            this.state.tock.pause();
-        }
-        this._setInactiveTaskInner();
+        this.state.tock.stop();
         this.setState(this.constructTimerState(false));
+        this._setTasksInactiveInner();
     }
 
-    // necessary for injection into initial constructor state before component is mounted
     constructTimerState(timerIsOn) {
         return {
             buttonText: timerIsOn ? 'Stop' : 'Start',

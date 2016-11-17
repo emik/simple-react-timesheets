@@ -8,21 +8,34 @@ class TaskEditModal extends React.Component {
         this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
         this.handleTimeChange = this.handleTimeChange.bind(this);
         this.state = {
-            description: this.props.currentEditingTask.description,
-            time: this.props.currentEditingTask.time
+            taskKey: null
         };
     }
+
+    componentWillReceiveProps(props) {
+        this.setState({
+            description: props.currentEditingTask.description,
+            time: props.currentEditingTask.time,
+            taskKey: props.taskKey
+        });
+        if(props.selectInput == 'description') {
+            this.descriptionInput.focus();
+        }else if(props.selectInput == 'time') {
+            this.timeInput.focus();
+        }
+    }
+
 
     render() {
         return (
             <form onSubmit={this._applyEditsInner}>
                 <div>
                     <label htmlFor="description">Description</label>
-                    <input type="text" name="description" id="description" value={this.state.description} onChange={this.handleDescriptionChange} />
+                    <input ref={(input) => this.descriptionInput = input} type="text" name="description" id="description" value={this.state.description} onChange={this.handleDescriptionChange} />
                 </div>
                 <div>
                     <label htmlFor="time">Time</label>
-                    <input type="text" name="time" id="time" value={this.state.time} onChange={this.handleTimeChange} />
+                    <input ref={(input) => this.timeInput = input} type="text" name="time" id="time" value={this.state.time} onChange={this.handleTimeChange} />
                 </div>
                 <button>Apply</button>
                 <button onClick={this.props.hideTaskEditor}>Close</button>
