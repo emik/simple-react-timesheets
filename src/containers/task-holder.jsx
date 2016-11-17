@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import { addTask, removeTask, editTask, updateTime, setActiveTask, setTasksInactive } from '../actions/index.jsx';
+import { addTask, removeTask, editTask, updateTime, setActiveTask, setInactiveTask } from '../actions/index.jsx';
 
 import Task from '../components/task.jsx';
 import TaskControls from '../components/task-controls.jsx';
@@ -18,11 +18,14 @@ class TaskHolder extends React.Component {
         this._applyEdits = this._applyEdits.bind(this);
         this._updateTime = this._updateTime.bind(this);
         this._setActiveTask = this._setActiveTask.bind(this);
-        this._setTasksInactive = this._setTasksInactive.bind(this);
+        this._setInactiveTask = this._setInactiveTask.bind(this);
         this.renderTasks = this.renderTasks.bind(this);
         this.renderTaskEditor = this.renderTaskEditor.bind(this);
         this.showTaskEditor = this.showTaskEditor.bind(this);
         this.hideTaskEditor = this.hideTaskEditor.bind(this);
+        this.inputFocusFinished = this.inputFocusFinished.bind(this);
+        this.handleTimeChange = this.handleTimeChange.bind(this);
+        this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
         this.state = {
             editingTask: false,
             currentEditingTask: null,
@@ -44,7 +47,7 @@ class TaskHolder extends React.Component {
                         itemID={task.key}
                         active={task.active}
                         _setActiveTask={this._setActiveTask}
-                        _setTasksInactive={this._setTasksInactive}
+                        _setInactiveTask={this._setInactiveTask}
                     />
                 );
             }
@@ -102,12 +105,19 @@ class TaskHolder extends React.Component {
             _applyEdits={this._applyEdits}
             currentEditingTask={this.state.currentEditingTask}
             hideTaskEditor={this.hideTaskEditor}
-            selectInput={this.state.selectInput}  />
+            selectInput={this.state.selectInput}
+            handleDescriptionChange={this.handleDescriptionChange}
+            handleTimeChange={this.handleTimeChange}
+            inputFocusFinished={this.inputFocusFinished}  />
         );
     }
 
-    _applyEdits(editedTask) {
-        this.props.editTask(editedTask);
+    inputFocusFinished() {
+        this.setState({selectInput: null});
+    }
+
+    _applyEdits() {
+        this.props.editTask(this.state.currentEditingTask);
     }
 
     _updateTime(taskKey, newTime) {
@@ -118,8 +128,20 @@ class TaskHolder extends React.Component {
         this.props.setActiveTask(taskKey);
     }
 
-    _setTasksInactive(taskKey) {
-        this.props.setTasksInactive(taskKey);
+    _setInactiveTask(taskKey) {
+        this.props.setInactiveTask(taskKey);
+    }
+
+    handleTimeChange(newTimeVal) {
+        this.setState({
+            currentEditingTask: Object.assign({}, this.state.currentEditingTask, {time: newTimeVal})
+        });
+    }
+
+    handleDescriptionChange(newDescriptionVal) {
+        this.setState({
+            currentEditingTask: Object.assign({}, this.state.currentEditingTask, {description: newDescriptionVal})
+        });
     }
 }
 
@@ -132,7 +154,7 @@ const mapStateToProps = (state) => {
 // anything returned from this function will end up as props on the TaskHolder container
 const mapDispatchToProps = (dispatch) => {
     // whenever addTask is called, result should be passed to all reducers
-    return bindActionCreators({ addTask, removeTask, editTask, updateTime, setActiveTask, setTasksInactive }, dispatch);
+    return bindActionCreators({ addTask, removeTask, editTask, updateTime, setActiveTask, setInactiveTask }, dispatch);
 }
 
 // promote TaskHolder to a container - needs to know about dispatch method, addTask - make it available as a prop

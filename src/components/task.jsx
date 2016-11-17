@@ -9,7 +9,7 @@ class Task extends React.Component {
         this._updateTimeInner = this._updateTimeInner.bind(this);
         this._removeTaskInner = this._removeTaskInner.bind(this);
         this._setActiveTaskInner = this._setActiveTaskInner.bind(this);
-        this._setTasksInactiveInner = this._setTasksInactiveInner.bind(this);
+        this._setInactiveTaskInner = this._setInactiveTaskInner.bind(this);
         this._showTaskEditor = this._showTaskEditor.bind(this);
         this._showTaskEditorSelectDescription = this._showTaskEditorSelectDescription.bind(this);
         this._showTaskEditorSelectTime = this._showTaskEditorSelectTime.bind(this);
@@ -78,8 +78,8 @@ class Task extends React.Component {
         this.props._setActiveTask(this.props.itemID);
     }
 
-    _setTasksInactiveInner() {
-        this.props._setTasksInactive(this.props.itemID);
+    _setInactiveTaskInner() {
+        this.props._setInactiveTask(this.props.itemID);
     }
 
     toggleTimer() {
@@ -101,11 +101,13 @@ class Task extends React.Component {
     }
 
     stopTimer() {
+        // needs check for safety cos .pause can unpause
         this.state.tock.stop();
         this.setState(this.constructTimerState(false));
-        this._setTasksInactiveInner();
+        this._setInactiveTaskInner();
     }
 
+    // necessary for injection into initial constructor state before component is mounted
     constructTimerState(timerIsOn) {
         return {
             buttonText: timerIsOn ? 'Stop' : 'Start',
