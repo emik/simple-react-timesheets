@@ -13,18 +13,16 @@ class TaskEditModal extends React.Component {
     }
 
     componentWillReceiveProps(props) {
-        console.log(props);
-        // if(props.currentEditingTask.taskKey != this.state.taskKey) {
-            setTimeout(()=>{
-                if(props.selectInput == 'description') {
-                    this.descriptionInput.focus();
-                }else if(props.selectInput == 'time') {
-                    this.timeInput.focus();
-                }
-                props.inputFocusFinished();
-            }, 1);
-            // set timeout super hacky fix to avoid timing issue when the timer is running and showing edit box
-        // }
+        // set timeout super hacky fix to avoid timing issues associated with showing the box and then focusing, 
+        // and possibly conflicts with the timer
+        setTimeout(()=>{
+            if(props.selectInput == 'description') {
+                this.descriptionInput.focus();
+            }else if(props.selectInput == 'time') {
+                this.timeInput.focus();
+            }
+            props.inputFocusFinished();
+        }, 10);
     }
 
 
