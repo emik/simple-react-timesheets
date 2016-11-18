@@ -25,7 +25,6 @@ class TaskEditModal extends React.Component {
         }, 10);
     }
 
-
     render() {
         return (
             <form onSubmit={this._applyEditsInner}>

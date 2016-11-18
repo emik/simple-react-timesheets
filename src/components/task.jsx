@@ -117,4 +117,16 @@ class Task extends React.Component {
 
 }
 
+Task.propTypes = {
+    active              : React.PropTypes.bool.isRequired,
+    _removeTask         : React.PropTypes.func.isRequired,
+    _updateTime         : React.PropTypes.func.isRequired,
+    showTaskEditor      : React.PropTypes.func.isRequired,
+    _setActiveTask      : React.PropTypes.func.isRequired,
+    _setInactiveTask    : React.PropTypes.func.isRequired,
+    description         : React.PropTypes.string.isRequired,
+    time                : React.PropTypes.string.isRequired,
+    itemID              : React.PropTypes.number.isRequired
+}
+
 export default Task;
