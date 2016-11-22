@@ -55,7 +55,6 @@ class TaskHolder extends React.Component {
     }
 
     render() {
-        let taskEditModal = this.state.editingTask ? this.renderTaskEditor() : '';
         return (
             <div>
                 <div>
@@ -63,7 +62,7 @@ class TaskHolder extends React.Component {
                 </div>
                 <TaskControls _addTask={this._addTask} />
                 <TaskTotals />
-                {taskEditModal}
+                {this.renderTaskEditor()}
             </div>
         );
     }
@@ -103,6 +102,7 @@ class TaskHolder extends React.Component {
         return (
             <TaskEditModal
             _applyEdits={this._applyEdits}
+            isVisible={this.state.editingTask}
             currentEditingTask={this.state.currentEditingTask}
             hideTaskEditor={this.hideTaskEditor}
             selectInput={this.state.selectInput}

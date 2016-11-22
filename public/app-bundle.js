@@ -54,16 +54,30 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _helloWorld = __webpack_require__(172);
+	var _taskHolder = __webpack_require__(172);
 
-	var _helloWorld2 = _interopRequireDefault(_helloWorld);
+	var _taskHolder2 = _interopRequireDefault(_taskHolder);
+
+	var _index = __webpack_require__(205);
+
+	var _index2 = _interopRequireDefault(_index);
+
+	var _reactRedux = __webpack_require__(173);
+
+	var _redux = __webpack_require__(180);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	__webpack_require__(173);
+	__webpack_require__(206);
 
 
-	_reactDom2.default.render(_react2.default.createElement(_helloWorld2.default, null), document.getElementById('root'));
+	var store = (0, _redux.createStore)(_index2.default);
+
+	_reactDom2.default.render(_react2.default.createElement(
+	    _reactRedux.Provider,
+	    { store: store },
+	    _react2.default.createElement(_taskHolder2.default, null)
+	), document.getElementById('root'));
 
 /***/ },
 /* 1 */
@@ -21442,27 +21456,2792 @@
 	    value: true
 	});
 
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRedux = __webpack_require__(173);
+
+	var _redux = __webpack_require__(180);
+
+	var _index = __webpack_require__(197);
+
+	var _task = __webpack_require__(199);
+
+	var _task2 = _interopRequireDefault(_task);
+
+	var _taskControls = __webpack_require__(201);
+
+	var _taskControls2 = _interopRequireDefault(_taskControls);
+
+	var _taskTotals = __webpack_require__(202);
+
+	var _taskTotals2 = _interopRequireDefault(_taskTotals);
+
+	var _taskEditModal = __webpack_require__(203);
+
+	var _taskEditModal2 = _interopRequireDefault(_taskEditModal);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var TaskHolder = function (_React$Component) {
+	    _inherits(TaskHolder, _React$Component);
+
+	    function TaskHolder(props) {
+	        _classCallCheck(this, TaskHolder);
+
+	        var _this = _possibleConstructorReturn(this, (TaskHolder.__proto__ || Object.getPrototypeOf(TaskHolder)).call(this, props));
+
+	        _this._addTask = _this._addTask.bind(_this);
+	        _this._removeTask = _this._removeTask.bind(_this);
+	        _this._applyEdits = _this._applyEdits.bind(_this);
+	        _this._updateTime = _this._updateTime.bind(_this);
+	        _this._setActiveTask = _this._setActiveTask.bind(_this);
+	        _this._setInactiveTask = _this._setInactiveTask.bind(_this);
+	        _this.renderTasks = _this.renderTasks.bind(_this);
+	        _this.renderTaskEditor = _this.renderTaskEditor.bind(_this);
+	        _this.showTaskEditor = _this.showTaskEditor.bind(_this);
+	        _this.hideTaskEditor = _this.hideTaskEditor.bind(_this);
+	        _this.inputFocusFinished = _this.inputFocusFinished.bind(_this);
+	        _this.handleTimeChange = _this.handleTimeChange.bind(_this);
+	        _this.handleDescriptionChange = _this.handleDescriptionChange.bind(_this);
+	        _this.state = {
+	            editingTask: false,
+	            currentEditingTask: null,
+	            selectInput: null
+	        };
+	        return _this;
+	    }
+
+	    _createClass(TaskHolder, [{
+	        key: 'renderTasks',
+	        value: function renderTasks() {
+	            var _this2 = this;
+
+	            return this.props.tasks.map(function (task) {
+	                return _react2.default.createElement(_task2.default, {
+	                    _removeTask: _this2._removeTask,
+	                    _updateTime: _this2._updateTime,
+	                    description: task.description,
+	                    showTaskEditor: _this2.showTaskEditor,
+	                    time: task.time,
+	                    key: task.key,
+	                    itemID: task.key,
+	                    active: task.active,
+	                    _setActiveTask: _this2._setActiveTask,
+	                    _setInactiveTask: _this2._setInactiveTask
+	                });
+	            });
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            return _react2.default.createElement(
+	                'div',
+	                null,
+	                _react2.default.createElement(
+	                    'div',
+	                    null,
+	                    this.renderTasks()
+	                ),
+	                _react2.default.createElement(_taskControls2.default, { _addTask: this._addTask }),
+	                _react2.default.createElement(_taskTotals2.default, null),
+	                this.renderTaskEditor()
+	            );
+	        }
+	    }, {
+	        key: 'getEmptyTask',
+	        value: function getEmptyTask() {
+	            return { description: '', time: '' };
+	        }
+	    }, {
+	        key: '_addTask',
+	        value: function _addTask() {
+	            this.props.addTask();
+	        }
+	    }, {
+	        key: '_removeTask',
+	        value: function _removeTask(taskKey) {
+	            if (confirm("Are you sure you want to delete this?")) {
+	                this.props.removeTask(taskKey);
+	            }
+	        }
+	    }, {
+	        key: 'showTaskEditor',
+	        value: function showTaskEditor(taskKey) {
+	            var selectInput = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+	            var filteredTaskArr = this.props.tasks.filter(function (task) {
+	                return task.key == taskKey;
+	            });
+	            if (filteredTaskArr.length === 0) {
+	                alert("The task no longer exists."); // shouldn't be hit
+	            }
+	            this.setState({
+	                editingTask: true,
+	                selectInput: selectInput,
+	                currentEditingTask: filteredTaskArr[0]
+	            });
+	        }
+	    }, {
+	        key: 'hideTaskEditor',
+	        value: function hideTaskEditor(event) {
+	            event.preventDefault();
+	            this.setState({ editingTask: false, currentEditingTask: null });
+	        }
+	    }, {
+	        key: 'renderTaskEditor',
+	        value: function renderTaskEditor() {
+	            return _react2.default.createElement(_taskEditModal2.default, {
+	                _applyEdits: this._applyEdits,
+	                isVisible: this.state.editingTask,
+	                currentEditingTask: this.state.currentEditingTask,
+	                hideTaskEditor: this.hideTaskEditor,
+	                selectInput: this.state.selectInput,
+	                handleDescriptionChange: this.handleDescriptionChange,
+	                handleTimeChange: this.handleTimeChange,
+	                inputFocusFinished: this.inputFocusFinished });
+	        }
+	    }, {
+	        key: 'inputFocusFinished',
+	        value: function inputFocusFinished() {
+	            this.setState({ selectInput: null });
+	        }
+	    }, {
+	        key: '_applyEdits',
+	        value: function _applyEdits() {
+	            this.props.editTask(this.state.currentEditingTask);
+	        }
+	    }, {
+	        key: '_updateTime',
+	        value: function _updateTime(taskKey, newTime) {
+	            this.props.updateTime(taskKey, newTime);
+	        }
+	    }, {
+	        key: '_setActiveTask',
+	        value: function _setActiveTask(taskKey) {
+	            this.props.setActiveTask(taskKey);
+	        }
+	    }, {
+	        key: '_setInactiveTask',
+	        value: function _setInactiveTask(taskKey) {
+	            this.props.setInactiveTask(taskKey);
+	        }
+	    }, {
+	        key: 'handleTimeChange',
+	        value: function handleTimeChange(newTimeVal) {
+	            this.setState({
+	                currentEditingTask: Object.assign({}, this.state.currentEditingTask, { time: newTimeVal })
+	            });
+	        }
+	    }, {
+	        key: 'handleDescriptionChange',
+	        value: function handleDescriptionChange(newDescriptionVal) {
+	            this.setState({
+	                currentEditingTask: Object.assign({}, this.state.currentEditingTask, { description: newDescriptionVal })
+	            });
+	        }
+	    }]);
+
+	    return TaskHolder;
+	}(_react2.default.Component);
+
+	var mapStateToProps = function mapStateToProps(state) {
+	    // whatever is returned will show up as props inside of taskholder
+	    return {
+	        tasks: state.tasks
+	    };
+	};
+	// anything returned from this function will end up as props on the TaskHolder container
+	var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+	    // whenever addTask is called, result should be passed to all reducers
+	    return (0, _redux.bindActionCreators)({ addTask: _index.addTask, removeTask: _index.removeTask, editTask: _index.editTask, updateTime: _index.updateTime, setActiveTask: _index.setActiveTask, setInactiveTask: _index.setInactiveTask }, dispatch);
+	};
+
+	// promote TaskHolder to a container - needs to know about dispatch method, addTask - make it available as a prop
+	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(TaskHolder);
+
+/***/ },
+/* 173 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports.connect = exports.Provider = undefined;
+
+	var _Provider = __webpack_require__(174);
+
+	var _Provider2 = _interopRequireDefault(_Provider);
+
+	var _connect = __webpack_require__(177);
+
+	var _connect2 = _interopRequireDefault(_connect);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+	exports.Provider = _Provider2["default"];
+	exports.connect = _connect2["default"];
+
+/***/ },
+/* 174 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
+
+	exports.__esModule = true;
+	exports["default"] = undefined;
+
+	var _react = __webpack_require__(1);
+
+	var _storeShape = __webpack_require__(175);
+
+	var _storeShape2 = _interopRequireDefault(_storeShape);
+
+	var _warning = __webpack_require__(176);
+
+	var _warning2 = _interopRequireDefault(_warning);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var didWarnAboutReceivingStore = false;
+	function warnAboutReceivingStore() {
+	  if (didWarnAboutReceivingStore) {
+	    return;
+	  }
+	  didWarnAboutReceivingStore = true;
+
+	  (0, _warning2["default"])('<Provider> does not support changing `store` on the fly. ' + 'It is most likely that you see this error because you updated to ' + 'Redux 2.x and React Redux 2.x which no longer hot reload reducers ' + 'automatically. See https://github.com/reactjs/react-redux/releases/' + 'tag/v2.0.0 for the migration instructions.');
+	}
+
+	var Provider = function (_Component) {
+	  _inherits(Provider, _Component);
+
+	  Provider.prototype.getChildContext = function getChildContext() {
+	    return { store: this.store };
+	  };
+
+	  function Provider(props, context) {
+	    _classCallCheck(this, Provider);
+
+	    var _this = _possibleConstructorReturn(this, _Component.call(this, props, context));
+
+	    _this.store = props.store;
+	    return _this;
+	  }
+
+	  Provider.prototype.render = function render() {
+	    var children = this.props.children;
+
+	    return _react.Children.only(children);
+	  };
+
+	  return Provider;
+	}(_react.Component);
+
+	exports["default"] = Provider;
+
+	if (process.env.NODE_ENV !== 'production') {
+	  Provider.prototype.componentWillReceiveProps = function (nextProps) {
+	    var store = this.store;
+	    var nextStore = nextProps.store;
+
+	    if (store !== nextStore) {
+	      warnAboutReceivingStore();
+	    }
+	  };
+	}
+
+	Provider.propTypes = {
+	  store: _storeShape2["default"].isRequired,
+	  children: _react.PropTypes.element.isRequired
+	};
+	Provider.childContextTypes = {
+	  store: _storeShape2["default"].isRequired
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ },
+/* 175 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+
+	var _react = __webpack_require__(1);
+
+	exports["default"] = _react.PropTypes.shape({
+	  subscribe: _react.PropTypes.func.isRequired,
+	  dispatch: _react.PropTypes.func.isRequired,
+	  getState: _react.PropTypes.func.isRequired
+	});
+
+/***/ },
+/* 176 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports["default"] = warning;
+	/**
+	 * Prints a warning in the console if it exists.
+	 *
+	 * @param {String} message The warning message.
+	 * @returns {void}
+	 */
+	function warning(message) {
+	  /* eslint-disable no-console */
+	  if (typeof console !== 'undefined' && typeof console.error === 'function') {
+	    console.error(message);
+	  }
+	  /* eslint-enable no-console */
+	  try {
+	    // This error was thrown as a convenience so that you can use this stack
+	    // to find the callsite that caused this warning to fire.
+	    throw new Error(message);
+	    /* eslint-disable no-empty */
+	  } catch (e) {}
+	  /* eslint-enable no-empty */
+	}
+
+/***/ },
+/* 177 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	exports.__esModule = true;
+	exports["default"] = connect;
+
+	var _react = __webpack_require__(1);
+
+	var _storeShape = __webpack_require__(175);
+
+	var _storeShape2 = _interopRequireDefault(_storeShape);
+
+	var _shallowEqual = __webpack_require__(178);
+
+	var _shallowEqual2 = _interopRequireDefault(_shallowEqual);
+
+	var _wrapActionCreators = __webpack_require__(179);
+
+	var _wrapActionCreators2 = _interopRequireDefault(_wrapActionCreators);
+
+	var _warning = __webpack_require__(176);
+
+	var _warning2 = _interopRequireDefault(_warning);
+
+	var _isPlainObject = __webpack_require__(182);
+
+	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
+
+	var _hoistNonReactStatics = __webpack_require__(195);
+
+	var _hoistNonReactStatics2 = _interopRequireDefault(_hoistNonReactStatics);
+
+	var _invariant = __webpack_require__(196);
+
+	var _invariant2 = _interopRequireDefault(_invariant);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var defaultMapStateToProps = function defaultMapStateToProps(state) {
+	  return {};
+	}; // eslint-disable-line no-unused-vars
+	var defaultMapDispatchToProps = function defaultMapDispatchToProps(dispatch) {
+	  return { dispatch: dispatch };
+	};
+	var defaultMergeProps = function defaultMergeProps(stateProps, dispatchProps, parentProps) {
+	  return _extends({}, parentProps, stateProps, dispatchProps);
+	};
+
+	function getDisplayName(WrappedComponent) {
+	  return WrappedComponent.displayName || WrappedComponent.name || 'Component';
+	}
+
+	var errorObject = { value: null };
+	function tryCatch(fn, ctx) {
+	  try {
+	    return fn.apply(ctx);
+	  } catch (e) {
+	    errorObject.value = e;
+	    return errorObject;
+	  }
+	}
+
+	// Helps track hot reloading.
+	var nextVersion = 0;
+
+	function connect(mapStateToProps, mapDispatchToProps, mergeProps) {
+	  var options = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];
+
+	  var shouldSubscribe = Boolean(mapStateToProps);
+	  var mapState = mapStateToProps || defaultMapStateToProps;
+
+	  var mapDispatch = undefined;
+	  if (typeof mapDispatchToProps === 'function') {
+	    mapDispatch = mapDispatchToProps;
+	  } else if (!mapDispatchToProps) {
+	    mapDispatch = defaultMapDispatchToProps;
+	  } else {
+	    mapDispatch = (0, _wrapActionCreators2["default"])(mapDispatchToProps);
+	  }
+
+	  var finalMergeProps = mergeProps || defaultMergeProps;
+	  var _options$pure = options.pure;
+	  var pure = _options$pure === undefined ? true : _options$pure;
+	  var _options$withRef = options.withRef;
+	  var withRef = _options$withRef === undefined ? false : _options$withRef;
+
+	  var checkMergedEquals = pure && finalMergeProps !== defaultMergeProps;
+
+	  // Helps track hot reloading.
+	  var version = nextVersion++;
+
+	  return function wrapWithConnect(WrappedComponent) {
+	    var connectDisplayName = 'Connect(' + getDisplayName(WrappedComponent) + ')';
+
+	    function checkStateShape(props, methodName) {
+	      if (!(0, _isPlainObject2["default"])(props)) {
+	        (0, _warning2["default"])(methodName + '() in ' + connectDisplayName + ' must return a plain object. ' + ('Instead received ' + props + '.'));
+	      }
+	    }
+
+	    function computeMergedProps(stateProps, dispatchProps, parentProps) {
+	      var mergedProps = finalMergeProps(stateProps, dispatchProps, parentProps);
+	      if (process.env.NODE_ENV !== 'production') {
+	        checkStateShape(mergedProps, 'mergeProps');
+	      }
+	      return mergedProps;
+	    }
+
+	    var Connect = function (_Component) {
+	      _inherits(Connect, _Component);
+
+	      Connect.prototype.shouldComponentUpdate = function shouldComponentUpdate() {
+	        return !pure || this.haveOwnPropsChanged || this.hasStoreStateChanged;
+	      };
+
+	      function Connect(props, context) {
+	        _classCallCheck(this, Connect);
+
+	        var _this = _possibleConstructorReturn(this, _Component.call(this, props, context));
+
+	        _this.version = version;
+	        _this.store = props.store || context.store;
+
+	        (0, _invariant2["default"])(_this.store, 'Could not find "store" in either the context or ' + ('props of "' + connectDisplayName + '". ') + 'Either wrap the root component in a <Provider>, ' + ('or explicitly pass "store" as a prop to "' + connectDisplayName + '".'));
+
+	        var storeState = _this.store.getState();
+	        _this.state = { storeState: storeState };
+	        _this.clearCache();
+	        return _this;
+	      }
+
+	      Connect.prototype.computeStateProps = function computeStateProps(store, props) {
+	        if (!this.finalMapStateToProps) {
+	          return this.configureFinalMapState(store, props);
+	        }
+
+	        var state = store.getState();
+	        var stateProps = this.doStatePropsDependOnOwnProps ? this.finalMapStateToProps(state, props) : this.finalMapStateToProps(state);
+
+	        if (process.env.NODE_ENV !== 'production') {
+	          checkStateShape(stateProps, 'mapStateToProps');
+	        }
+	        return stateProps;
+	      };
+
+	      Connect.prototype.configureFinalMapState = function configureFinalMapState(store, props) {
+	        var mappedState = mapState(store.getState(), props);
+	        var isFactory = typeof mappedState === 'function';
+
+	        this.finalMapStateToProps = isFactory ? mappedState : mapState;
+	        this.doStatePropsDependOnOwnProps = this.finalMapStateToProps.length !== 1;
+
+	        if (isFactory) {
+	          return this.computeStateProps(store, props);
+	        }
+
+	        if (process.env.NODE_ENV !== 'production') {
+	          checkStateShape(mappedState, 'mapStateToProps');
+	        }
+	        return mappedState;
+	      };
+
+	      Connect.prototype.computeDispatchProps = function computeDispatchProps(store, props) {
+	        if (!this.finalMapDispatchToProps) {
+	          return this.configureFinalMapDispatch(store, props);
+	        }
+
+	        var dispatch = store.dispatch;
+
+	        var dispatchProps = this.doDispatchPropsDependOnOwnProps ? this.finalMapDispatchToProps(dispatch, props) : this.finalMapDispatchToProps(dispatch);
+
+	        if (process.env.NODE_ENV !== 'production') {
+	          checkStateShape(dispatchProps, 'mapDispatchToProps');
+	        }
+	        return dispatchProps;
+	      };
+
+	      Connect.prototype.configureFinalMapDispatch = function configureFinalMapDispatch(store, props) {
+	        var mappedDispatch = mapDispatch(store.dispatch, props);
+	        var isFactory = typeof mappedDispatch === 'function';
+
+	        this.finalMapDispatchToProps = isFactory ? mappedDispatch : mapDispatch;
+	        this.doDispatchPropsDependOnOwnProps = this.finalMapDispatchToProps.length !== 1;
+
+	        if (isFactory) {
+	          return this.computeDispatchProps(store, props);
+	        }
+
+	        if (process.env.NODE_ENV !== 'production') {
+	          checkStateShape(mappedDispatch, 'mapDispatchToProps');
+	        }
+	        return mappedDispatch;
+	      };
+
+	      Connect.prototype.updateStatePropsIfNeeded = function updateStatePropsIfNeeded() {
+	        var nextStateProps = this.computeStateProps(this.store, this.props);
+	        if (this.stateProps && (0, _shallowEqual2["default"])(nextStateProps, this.stateProps)) {
+	          return false;
+	        }
+
+	        this.stateProps = nextStateProps;
+	        return true;
+	      };
+
+	      Connect.prototype.updateDispatchPropsIfNeeded = function updateDispatchPropsIfNeeded() {
+	        var nextDispatchProps = this.computeDispatchProps(this.store, this.props);
+	        if (this.dispatchProps && (0, _shallowEqual2["default"])(nextDispatchProps, this.dispatchProps)) {
+	          return false;
+	        }
+
+	        this.dispatchProps = nextDispatchProps;
+	        return true;
+	      };
+
+	      Connect.prototype.updateMergedPropsIfNeeded = function updateMergedPropsIfNeeded() {
+	        var nextMergedProps = computeMergedProps(this.stateProps, this.dispatchProps, this.props);
+	        if (this.mergedProps && checkMergedEquals && (0, _shallowEqual2["default"])(nextMergedProps, this.mergedProps)) {
+	          return false;
+	        }
+
+	        this.mergedProps = nextMergedProps;
+	        return true;
+	      };
+
+	      Connect.prototype.isSubscribed = function isSubscribed() {
+	        return typeof this.unsubscribe === 'function';
+	      };
+
+	      Connect.prototype.trySubscribe = function trySubscribe() {
+	        if (shouldSubscribe && !this.unsubscribe) {
+	          this.unsubscribe = this.store.subscribe(this.handleChange.bind(this));
+	          this.handleChange();
+	        }
+	      };
+
+	      Connect.prototype.tryUnsubscribe = function tryUnsubscribe() {
+	        if (this.unsubscribe) {
+	          this.unsubscribe();
+	          this.unsubscribe = null;
+	        }
+	      };
+
+	      Connect.prototype.componentDidMount = function componentDidMount() {
+	        this.trySubscribe();
+	      };
+
+	      Connect.prototype.componentWillReceiveProps = function componentWillReceiveProps(nextProps) {
+	        if (!pure || !(0, _shallowEqual2["default"])(nextProps, this.props)) {
+	          this.haveOwnPropsChanged = true;
+	        }
+	      };
+
+	      Connect.prototype.componentWillUnmount = function componentWillUnmount() {
+	        this.tryUnsubscribe();
+	        this.clearCache();
+	      };
+
+	      Connect.prototype.clearCache = function clearCache() {
+	        this.dispatchProps = null;
+	        this.stateProps = null;
+	        this.mergedProps = null;
+	        this.haveOwnPropsChanged = true;
+	        this.hasStoreStateChanged = true;
+	        this.haveStatePropsBeenPrecalculated = false;
+	        this.statePropsPrecalculationError = null;
+	        this.renderedElement = null;
+	        this.finalMapDispatchToProps = null;
+	        this.finalMapStateToProps = null;
+	      };
+
+	      Connect.prototype.handleChange = function handleChange() {
+	        if (!this.unsubscribe) {
+	          return;
+	        }
+
+	        var storeState = this.store.getState();
+	        var prevStoreState = this.state.storeState;
+	        if (pure && prevStoreState === storeState) {
+	          return;
+	        }
+
+	        if (pure && !this.doStatePropsDependOnOwnProps) {
+	          var haveStatePropsChanged = tryCatch(this.updateStatePropsIfNeeded, this);
+	          if (!haveStatePropsChanged) {
+	            return;
+	          }
+	          if (haveStatePropsChanged === errorObject) {
+	            this.statePropsPrecalculationError = errorObject.value;
+	          }
+	          this.haveStatePropsBeenPrecalculated = true;
+	        }
+
+	        this.hasStoreStateChanged = true;
+	        this.setState({ storeState: storeState });
+	      };
+
+	      Connect.prototype.getWrappedInstance = function getWrappedInstance() {
+	        (0, _invariant2["default"])(withRef, 'To access the wrapped instance, you need to specify ' + '{ withRef: true } as the fourth argument of the connect() call.');
+
+	        return this.refs.wrappedInstance;
+	      };
+
+	      Connect.prototype.render = function render() {
+	        var haveOwnPropsChanged = this.haveOwnPropsChanged;
+	        var hasStoreStateChanged = this.hasStoreStateChanged;
+	        var haveStatePropsBeenPrecalculated = this.haveStatePropsBeenPrecalculated;
+	        var statePropsPrecalculationError = this.statePropsPrecalculationError;
+	        var renderedElement = this.renderedElement;
+
+	        this.haveOwnPropsChanged = false;
+	        this.hasStoreStateChanged = false;
+	        this.haveStatePropsBeenPrecalculated = false;
+	        this.statePropsPrecalculationError = null;
+
+	        if (statePropsPrecalculationError) {
+	          throw statePropsPrecalculationError;
+	        }
+
+	        var shouldUpdateStateProps = true;
+	        var shouldUpdateDispatchProps = true;
+	        if (pure && renderedElement) {
+	          shouldUpdateStateProps = hasStoreStateChanged || haveOwnPropsChanged && this.doStatePropsDependOnOwnProps;
+	          shouldUpdateDispatchProps = haveOwnPropsChanged && this.doDispatchPropsDependOnOwnProps;
+	        }
+
+	        var haveStatePropsChanged = false;
+	        var haveDispatchPropsChanged = false;
+	        if (haveStatePropsBeenPrecalculated) {
+	          haveStatePropsChanged = true;
+	        } else if (shouldUpdateStateProps) {
+	          haveStatePropsChanged = this.updateStatePropsIfNeeded();
+	        }
+	        if (shouldUpdateDispatchProps) {
+	          haveDispatchPropsChanged = this.updateDispatchPropsIfNeeded();
+	        }
+
+	        var haveMergedPropsChanged = true;
+	        if (haveStatePropsChanged || haveDispatchPropsChanged || haveOwnPropsChanged) {
+	          haveMergedPropsChanged = this.updateMergedPropsIfNeeded();
+	        } else {
+	          haveMergedPropsChanged = false;
+	        }
+
+	        if (!haveMergedPropsChanged && renderedElement) {
+	          return renderedElement;
+	        }
+
+	        if (withRef) {
+	          this.renderedElement = (0, _react.createElement)(WrappedComponent, _extends({}, this.mergedProps, {
+	            ref: 'wrappedInstance'
+	          }));
+	        } else {
+	          this.renderedElement = (0, _react.createElement)(WrappedComponent, this.mergedProps);
+	        }
+
+	        return this.renderedElement;
+	      };
+
+	      return Connect;
+	    }(_react.Component);
+
+	    Connect.displayName = connectDisplayName;
+	    Connect.WrappedComponent = WrappedComponent;
+	    Connect.contextTypes = {
+	      store: _storeShape2["default"]
+	    };
+	    Connect.propTypes = {
+	      store: _storeShape2["default"]
+	    };
+
+	    if (process.env.NODE_ENV !== 'production') {
+	      Connect.prototype.componentWillUpdate = function componentWillUpdate() {
+	        if (this.version === version) {
+	          return;
+	        }
+
+	        // We are hot reloading!
+	        this.version = version;
+	        this.trySubscribe();
+	        this.clearCache();
+	      };
+	    }
+
+	    return (0, _hoistNonReactStatics2["default"])(Connect, WrappedComponent);
+	  };
+	}
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ },
+/* 178 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	exports.__esModule = true;
+	exports["default"] = shallowEqual;
+	function shallowEqual(objA, objB) {
+	  if (objA === objB) {
+	    return true;
+	  }
+
+	  var keysA = Object.keys(objA);
+	  var keysB = Object.keys(objB);
+
+	  if (keysA.length !== keysB.length) {
+	    return false;
+	  }
+
+	  // Test for A's keys different from B.
+	  var hasOwn = Object.prototype.hasOwnProperty;
+	  for (var i = 0; i < keysA.length; i++) {
+	    if (!hasOwn.call(objB, keysA[i]) || objA[keysA[i]] !== objB[keysA[i]]) {
+	      return false;
+	    }
+	  }
+
+	  return true;
+	}
+
+/***/ },
+/* 179 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports["default"] = wrapActionCreators;
+
+	var _redux = __webpack_require__(180);
+
+	function wrapActionCreators(actionCreators) {
+	  return function (dispatch) {
+	    return (0, _redux.bindActionCreators)(actionCreators, dispatch);
+	  };
+	}
+
+/***/ },
+/* 180 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
+
+	exports.__esModule = true;
+	exports.compose = exports.applyMiddleware = exports.bindActionCreators = exports.combineReducers = exports.createStore = undefined;
+
+	var _createStore = __webpack_require__(181);
+
+	var _createStore2 = _interopRequireDefault(_createStore);
+
+	var _combineReducers = __webpack_require__(190);
+
+	var _combineReducers2 = _interopRequireDefault(_combineReducers);
+
+	var _bindActionCreators = __webpack_require__(192);
+
+	var _bindActionCreators2 = _interopRequireDefault(_bindActionCreators);
+
+	var _applyMiddleware = __webpack_require__(193);
+
+	var _applyMiddleware2 = _interopRequireDefault(_applyMiddleware);
+
+	var _compose = __webpack_require__(194);
+
+	var _compose2 = _interopRequireDefault(_compose);
+
+	var _warning = __webpack_require__(191);
+
+	var _warning2 = _interopRequireDefault(_warning);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	/*
+	* This is a dummy function to check if the function name has been altered by minification.
+	* If the function has been minified and NODE_ENV !== 'production', warn the user.
+	*/
+	function isCrushed() {}
+
+	if (process.env.NODE_ENV !== 'production' && typeof isCrushed.name === 'string' && isCrushed.name !== 'isCrushed') {
+	  (0, _warning2['default'])('You are currently using minified code outside of NODE_ENV === \'production\'. ' + 'This means that you are running a slower development build of Redux. ' + 'You can use loose-envify (https://github.com/zertosh/loose-envify) for browserify ' + 'or DefinePlugin for webpack (http://stackoverflow.com/questions/30030031) ' + 'to ensure you have the correct code for your production build.');
+	}
+
+	exports.createStore = _createStore2['default'];
+	exports.combineReducers = _combineReducers2['default'];
+	exports.bindActionCreators = _bindActionCreators2['default'];
+	exports.applyMiddleware = _applyMiddleware2['default'];
+	exports.compose = _compose2['default'];
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ },
+/* 181 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports.ActionTypes = undefined;
+	exports['default'] = createStore;
+
+	var _isPlainObject = __webpack_require__(182);
+
+	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
+
+	var _symbolObservable = __webpack_require__(186);
+
+	var _symbolObservable2 = _interopRequireDefault(_symbolObservable);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	/**
+	 * These are private action types reserved by Redux.
+	 * For any unknown actions, you must return the current state.
+	 * If the current state is undefined, you must return the initial state.
+	 * Do not reference these action types directly in your code.
+	 */
+	var ActionTypes = exports.ActionTypes = {
+	  INIT: '@@redux/INIT'
+	};
+
+	/**
+	 * Creates a Redux store that holds the state tree.
+	 * The only way to change the data in the store is to call `dispatch()` on it.
+	 *
+	 * There should only be a single store in your app. To specify how different
+	 * parts of the state tree respond to actions, you may combine several reducers
+	 * into a single reducer function by using `combineReducers`.
+	 *
+	 * @param {Function} reducer A function that returns the next state tree, given
+	 * the current state tree and the action to handle.
+	 *
+	 * @param {any} [preloadedState] The initial state. You may optionally specify it
+	 * to hydrate the state from the server in universal apps, or to restore a
+	 * previously serialized user session.
+	 * If you use `combineReducers` to produce the root reducer function, this must be
+	 * an object with the same shape as `combineReducers` keys.
+	 *
+	 * @param {Function} enhancer The store enhancer. You may optionally specify it
+	 * to enhance the store with third-party capabilities such as middleware,
+	 * time travel, persistence, etc. The only store enhancer that ships with Redux
+	 * is `applyMiddleware()`.
+	 *
+	 * @returns {Store} A Redux store that lets you read the state, dispatch actions
+	 * and subscribe to changes.
+	 */
+	function createStore(reducer, preloadedState, enhancer) {
+	  var _ref2;
+
+	  if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
+	    enhancer = preloadedState;
+	    preloadedState = undefined;
+	  }
+
+	  if (typeof enhancer !== 'undefined') {
+	    if (typeof enhancer !== 'function') {
+	      throw new Error('Expected the enhancer to be a function.');
+	    }
+
+	    return enhancer(createStore)(reducer, preloadedState);
+	  }
+
+	  if (typeof reducer !== 'function') {
+	    throw new Error('Expected the reducer to be a function.');
+	  }
+
+	  var currentReducer = reducer;
+	  var currentState = preloadedState;
+	  var currentListeners = [];
+	  var nextListeners = currentListeners;
+	  var isDispatching = false;
+
+	  function ensureCanMutateNextListeners() {
+	    if (nextListeners === currentListeners) {
+	      nextListeners = currentListeners.slice();
+	    }
+	  }
+
+	  /**
+	   * Reads the state tree managed by the store.
+	   *
+	   * @returns {any} The current state tree of your application.
+	   */
+	  function getState() {
+	    return currentState;
+	  }
+
+	  /**
+	   * Adds a change listener. It will be called any time an action is dispatched,
+	   * and some part of the state tree may potentially have changed. You may then
+	   * call `getState()` to read the current state tree inside the callback.
+	   *
+	   * You may call `dispatch()` from a change listener, with the following
+	   * caveats:
+	   *
+	   * 1. The subscriptions are snapshotted just before every `dispatch()` call.
+	   * If you subscribe or unsubscribe while the listeners are being invoked, this
+	   * will not have any effect on the `dispatch()` that is currently in progress.
+	   * However, the next `dispatch()` call, whether nested or not, will use a more
+	   * recent snapshot of the subscription list.
+	   *
+	   * 2. The listener should not expect to see all state changes, as the state
+	   * might have been updated multiple times during a nested `dispatch()` before
+	   * the listener is called. It is, however, guaranteed that all subscribers
+	   * registered before the `dispatch()` started will be called with the latest
+	   * state by the time it exits.
+	   *
+	   * @param {Function} listener A callback to be invoked on every dispatch.
+	   * @returns {Function} A function to remove this change listener.
+	   */
+	  function subscribe(listener) {
+	    if (typeof listener !== 'function') {
+	      throw new Error('Expected listener to be a function.');
+	    }
+
+	    var isSubscribed = true;
+
+	    ensureCanMutateNextListeners();
+	    nextListeners.push(listener);
+
+	    return function unsubscribe() {
+	      if (!isSubscribed) {
+	        return;
+	      }
+
+	      isSubscribed = false;
+
+	      ensureCanMutateNextListeners();
+	      var index = nextListeners.indexOf(listener);
+	      nextListeners.splice(index, 1);
+	    };
+	  }
+
+	  /**
+	   * Dispatches an action. It is the only way to trigger a state change.
+	   *
+	   * The `reducer` function, used to create the store, will be called with the
+	   * current state tree and the given `action`. Its return value will
+	   * be considered the **next** state of the tree, and the change listeners
+	   * will be notified.
+	   *
+	   * The base implementation only supports plain object actions. If you want to
+	   * dispatch a Promise, an Observable, a thunk, or something else, you need to
+	   * wrap your store creating function into the corresponding middleware. For
+	   * example, see the documentation for the `redux-thunk` package. Even the
+	   * middleware will eventually dispatch plain object actions using this method.
+	   *
+	   * @param {Object} action A plain object representing “what changed”. It is
+	   * a good idea to keep actions serializable so you can record and replay user
+	   * sessions, or use the time travelling `redux-devtools`. An action must have
+	   * a `type` property which may not be `undefined`. It is a good idea to use
+	   * string constants for action types.
+	   *
+	   * @returns {Object} For convenience, the same action object you dispatched.
+	   *
+	   * Note that, if you use a custom middleware, it may wrap `dispatch()` to
+	   * return something else (for example, a Promise you can await).
+	   */
+	  function dispatch(action) {
+	    if (!(0, _isPlainObject2['default'])(action)) {
+	      throw new Error('Actions must be plain objects. ' + 'Use custom middleware for async actions.');
+	    }
+
+	    if (typeof action.type === 'undefined') {
+	      throw new Error('Actions may not have an undefined "type" property. ' + 'Have you misspelled a constant?');
+	    }
+
+	    if (isDispatching) {
+	      throw new Error('Reducers may not dispatch actions.');
+	    }
+
+	    try {
+	      isDispatching = true;
+	      currentState = currentReducer(currentState, action);
+	    } finally {
+	      isDispatching = false;
+	    }
+
+	    var listeners = currentListeners = nextListeners;
+	    for (var i = 0; i < listeners.length; i++) {
+	      listeners[i]();
+	    }
+
+	    return action;
+	  }
+
+	  /**
+	   * Replaces the reducer currently used by the store to calculate the state.
+	   *
+	   * You might need this if your app implements code splitting and you want to
+	   * load some of the reducers dynamically. You might also need this if you
+	   * implement a hot reloading mechanism for Redux.
+	   *
+	   * @param {Function} nextReducer The reducer for the store to use instead.
+	   * @returns {void}
+	   */
+	  function replaceReducer(nextReducer) {
+	    if (typeof nextReducer !== 'function') {
+	      throw new Error('Expected the nextReducer to be a function.');
+	    }
+
+	    currentReducer = nextReducer;
+	    dispatch({ type: ActionTypes.INIT });
+	  }
+
+	  /**
+	   * Interoperability point for observable/reactive libraries.
+	   * @returns {observable} A minimal observable of state changes.
+	   * For more information, see the observable proposal:
+	   * https://github.com/zenparsing/es-observable
+	   */
+	  function observable() {
+	    var _ref;
+
+	    var outerSubscribe = subscribe;
+	    return _ref = {
+	      /**
+	       * The minimal observable subscription method.
+	       * @param {Object} observer Any object that can be used as an observer.
+	       * The observer object should have a `next` method.
+	       * @returns {subscription} An object with an `unsubscribe` method that can
+	       * be used to unsubscribe the observable from the store, and prevent further
+	       * emission of values from the observable.
+	       */
+	      subscribe: function subscribe(observer) {
+	        if (typeof observer !== 'object') {
+	          throw new TypeError('Expected the observer to be an object.');
+	        }
+
+	        function observeState() {
+	          if (observer.next) {
+	            observer.next(getState());
+	          }
+	        }
+
+	        observeState();
+	        var unsubscribe = outerSubscribe(observeState);
+	        return { unsubscribe: unsubscribe };
+	      }
+	    }, _ref[_symbolObservable2['default']] = function () {
+	      return this;
+	    }, _ref;
+	  }
+
+	  // When a store is created, an "INIT" action is dispatched so that every
+	  // reducer returns their initial state. This effectively populates
+	  // the initial state tree.
+	  dispatch({ type: ActionTypes.INIT });
+
+	  return _ref2 = {
+	    dispatch: dispatch,
+	    subscribe: subscribe,
+	    getState: getState,
+	    replaceReducer: replaceReducer
+	  }, _ref2[_symbolObservable2['default']] = observable, _ref2;
+	}
+
+/***/ },
+/* 182 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var getPrototype = __webpack_require__(183),
+	    isObjectLike = __webpack_require__(185);
+
+	/** `Object#toString` result references. */
+	var objectTag = '[object Object]';
+
+	/** Used for built-in method references. */
+	var funcProto = Function.prototype,
+	    objectProto = Object.prototype;
+
+	/** Used to resolve the decompiled source of functions. */
+	var funcToString = funcProto.toString;
+
+	/** Used to check objects for own properties. */
+	var hasOwnProperty = objectProto.hasOwnProperty;
+
+	/** Used to infer the `Object` constructor. */
+	var objectCtorString = funcToString.call(Object);
+
+	/**
+	 * Used to resolve the
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+	 * of values.
+	 */
+	var objectToString = objectProto.toString;
+
+	/**
+	 * Checks if `value` is a plain object, that is, an object created by the
+	 * `Object` constructor or one with a `[[Prototype]]` of `null`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.8.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
+	 * @example
+	 *
+	 * function Foo() {
+	 *   this.a = 1;
+	 * }
+	 *
+	 * _.isPlainObject(new Foo);
+	 * // => false
+	 *
+	 * _.isPlainObject([1, 2, 3]);
+	 * // => false
+	 *
+	 * _.isPlainObject({ 'x': 0, 'y': 0 });
+	 * // => true
+	 *
+	 * _.isPlainObject(Object.create(null));
+	 * // => true
+	 */
+	function isPlainObject(value) {
+	  if (!isObjectLike(value) || objectToString.call(value) != objectTag) {
+	    return false;
+	  }
+	  var proto = getPrototype(value);
+	  if (proto === null) {
+	    return true;
+	  }
+	  var Ctor = hasOwnProperty.call(proto, 'constructor') && proto.constructor;
+	  return (typeof Ctor == 'function' &&
+	    Ctor instanceof Ctor && funcToString.call(Ctor) == objectCtorString);
+	}
+
+	module.exports = isPlainObject;
+
+
+/***/ },
+/* 183 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var overArg = __webpack_require__(184);
+
+	/** Built-in value references. */
+	var getPrototype = overArg(Object.getPrototypeOf, Object);
+
+	module.exports = getPrototype;
+
+
+/***/ },
+/* 184 */
+/***/ function(module, exports) {
+
+	/**
+	 * Creates a unary function that invokes `func` with its argument transformed.
+	 *
+	 * @private
+	 * @param {Function} func The function to wrap.
+	 * @param {Function} transform The argument transform.
+	 * @returns {Function} Returns the new function.
+	 */
+	function overArg(func, transform) {
+	  return function(arg) {
+	    return func(transform(arg));
+	  };
+	}
+
+	module.exports = overArg;
+
+
+/***/ },
+/* 185 */
+/***/ function(module, exports) {
+
+	/**
+	 * Checks if `value` is object-like. A value is object-like if it's not `null`
+	 * and has a `typeof` result of "object".
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+	 * @example
+	 *
+	 * _.isObjectLike({});
+	 * // => true
+	 *
+	 * _.isObjectLike([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObjectLike(_.noop);
+	 * // => false
+	 *
+	 * _.isObjectLike(null);
+	 * // => false
+	 */
+	function isObjectLike(value) {
+	  return value != null && typeof value == 'object';
+	}
+
+	module.exports = isObjectLike;
+
+
+/***/ },
+/* 186 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(187);
+
+
+/***/ },
+/* 187 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global, module) {'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _ponyfill = __webpack_require__(189);
+
+	var _ponyfill2 = _interopRequireDefault(_ponyfill);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var root; /* global window */
+
+
+	if (typeof self !== 'undefined') {
+	  root = self;
+	} else if (typeof window !== 'undefined') {
+	  root = window;
+	} else if (typeof global !== 'undefined') {
+	  root = global;
+	} else if (true) {
+	  root = module;
+	} else {
+	  root = Function('return this')();
+	}
+
+	var result = (0, _ponyfill2['default'])(root);
+	exports['default'] = result;
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(188)(module)))
+
+/***/ },
+/* 188 */
+/***/ function(module, exports) {
+
+	module.exports = function(module) {
+		if(!module.webpackPolyfill) {
+			module.deprecate = function() {};
+			module.paths = [];
+			// module.parent = undefined by default
+			module.children = [];
+			module.webpackPolyfill = 1;
+		}
+		return module;
+	}
+
+
+/***/ },
+/* 189 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports['default'] = symbolObservablePonyfill;
+	function symbolObservablePonyfill(root) {
+		var result;
+		var _Symbol = root.Symbol;
+
+		if (typeof _Symbol === 'function') {
+			if (_Symbol.observable) {
+				result = _Symbol.observable;
+			} else {
+				result = _Symbol('observable');
+				_Symbol.observable = result;
+			}
+		} else {
+			result = '@@observable';
+		}
+
+		return result;
+	};
+
+/***/ },
+/* 190 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
+
+	exports.__esModule = true;
+	exports['default'] = combineReducers;
+
+	var _createStore = __webpack_require__(181);
+
+	var _isPlainObject = __webpack_require__(182);
+
+	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
+
+	var _warning = __webpack_require__(191);
+
+	var _warning2 = _interopRequireDefault(_warning);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	function getUndefinedStateErrorMessage(key, action) {
+	  var actionType = action && action.type;
+	  var actionName = actionType && '"' + actionType.toString() + '"' || 'an action';
+
+	  return 'Given action ' + actionName + ', reducer "' + key + '" returned undefined. ' + 'To ignore an action, you must explicitly return the previous state.';
+	}
+
+	function getUnexpectedStateShapeWarningMessage(inputState, reducers, action, unexpectedKeyCache) {
+	  var reducerKeys = Object.keys(reducers);
+	  var argumentName = action && action.type === _createStore.ActionTypes.INIT ? 'preloadedState argument passed to createStore' : 'previous state received by the reducer';
+
+	  if (reducerKeys.length === 0) {
+	    return 'Store does not have a valid reducer. Make sure the argument passed ' + 'to combineReducers is an object whose values are reducers.';
+	  }
+
+	  if (!(0, _isPlainObject2['default'])(inputState)) {
+	    return 'The ' + argumentName + ' has unexpected type of "' + {}.toString.call(inputState).match(/\s([a-z|A-Z]+)/)[1] + '". Expected argument to be an object with the following ' + ('keys: "' + reducerKeys.join('", "') + '"');
+	  }
+
+	  var unexpectedKeys = Object.keys(inputState).filter(function (key) {
+	    return !reducers.hasOwnProperty(key) && !unexpectedKeyCache[key];
+	  });
+
+	  unexpectedKeys.forEach(function (key) {
+	    unexpectedKeyCache[key] = true;
+	  });
+
+	  if (unexpectedKeys.length > 0) {
+	    return 'Unexpected ' + (unexpectedKeys.length > 1 ? 'keys' : 'key') + ' ' + ('"' + unexpectedKeys.join('", "') + '" found in ' + argumentName + '. ') + 'Expected to find one of the known reducer keys instead: ' + ('"' + reducerKeys.join('", "') + '". Unexpected keys will be ignored.');
+	  }
+	}
+
+	function assertReducerSanity(reducers) {
+	  Object.keys(reducers).forEach(function (key) {
+	    var reducer = reducers[key];
+	    var initialState = reducer(undefined, { type: _createStore.ActionTypes.INIT });
+
+	    if (typeof initialState === 'undefined') {
+	      throw new Error('Reducer "' + key + '" returned undefined during initialization. ' + 'If the state passed to the reducer is undefined, you must ' + 'explicitly return the initial state. The initial state may ' + 'not be undefined.');
+	    }
+
+	    var type = '@@redux/PROBE_UNKNOWN_ACTION_' + Math.random().toString(36).substring(7).split('').join('.');
+	    if (typeof reducer(undefined, { type: type }) === 'undefined') {
+	      throw new Error('Reducer "' + key + '" returned undefined when probed with a random type. ' + ('Don\'t try to handle ' + _createStore.ActionTypes.INIT + ' or other actions in "redux/*" ') + 'namespace. They are considered private. Instead, you must return the ' + 'current state for any unknown actions, unless it is undefined, ' + 'in which case you must return the initial state, regardless of the ' + 'action type. The initial state may not be undefined.');
+	    }
+	  });
+	}
+
+	/**
+	 * Turns an object whose values are different reducer functions, into a single
+	 * reducer function. It will call every child reducer, and gather their results
+	 * into a single state object, whose keys correspond to the keys of the passed
+	 * reducer functions.
+	 *
+	 * @param {Object} reducers An object whose values correspond to different
+	 * reducer functions that need to be combined into one. One handy way to obtain
+	 * it is to use ES6 `import * as reducers` syntax. The reducers may never return
+	 * undefined for any action. Instead, they should return their initial state
+	 * if the state passed to them was undefined, and the current state for any
+	 * unrecognized action.
+	 *
+	 * @returns {Function} A reducer function that invokes every reducer inside the
+	 * passed object, and builds a state object with the same shape.
+	 */
+	function combineReducers(reducers) {
+	  var reducerKeys = Object.keys(reducers);
+	  var finalReducers = {};
+	  for (var i = 0; i < reducerKeys.length; i++) {
+	    var key = reducerKeys[i];
+
+	    if (process.env.NODE_ENV !== 'production') {
+	      if (typeof reducers[key] === 'undefined') {
+	        (0, _warning2['default'])('No reducer provided for key "' + key + '"');
+	      }
+	    }
+
+	    if (typeof reducers[key] === 'function') {
+	      finalReducers[key] = reducers[key];
+	    }
+	  }
+	  var finalReducerKeys = Object.keys(finalReducers);
+
+	  if (process.env.NODE_ENV !== 'production') {
+	    var unexpectedKeyCache = {};
+	  }
+
+	  var sanityError;
+	  try {
+	    assertReducerSanity(finalReducers);
+	  } catch (e) {
+	    sanityError = e;
+	  }
+
+	  return function combination() {
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	    var action = arguments[1];
+
+	    if (sanityError) {
+	      throw sanityError;
+	    }
+
+	    if (process.env.NODE_ENV !== 'production') {
+	      var warningMessage = getUnexpectedStateShapeWarningMessage(state, finalReducers, action, unexpectedKeyCache);
+	      if (warningMessage) {
+	        (0, _warning2['default'])(warningMessage);
+	      }
+	    }
+
+	    var hasChanged = false;
+	    var nextState = {};
+	    for (var i = 0; i < finalReducerKeys.length; i++) {
+	      var key = finalReducerKeys[i];
+	      var reducer = finalReducers[key];
+	      var previousStateForKey = state[key];
+	      var nextStateForKey = reducer(previousStateForKey, action);
+	      if (typeof nextStateForKey === 'undefined') {
+	        var errorMessage = getUndefinedStateErrorMessage(key, action);
+	        throw new Error(errorMessage);
+	      }
+	      nextState[key] = nextStateForKey;
+	      hasChanged = hasChanged || nextStateForKey !== previousStateForKey;
+	    }
+	    return hasChanged ? nextState : state;
+	  };
+	}
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ },
+/* 191 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports['default'] = warning;
+	/**
+	 * Prints a warning in the console if it exists.
+	 *
+	 * @param {String} message The warning message.
+	 * @returns {void}
+	 */
+	function warning(message) {
+	  /* eslint-disable no-console */
+	  if (typeof console !== 'undefined' && typeof console.error === 'function') {
+	    console.error(message);
+	  }
+	  /* eslint-enable no-console */
+	  try {
+	    // This error was thrown as a convenience so that if you enable
+	    // "break on all exceptions" in your console,
+	    // it would pause the execution at this line.
+	    throw new Error(message);
+	    /* eslint-disable no-empty */
+	  } catch (e) {}
+	  /* eslint-enable no-empty */
+	}
+
+/***/ },
+/* 192 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports['default'] = bindActionCreators;
+	function bindActionCreator(actionCreator, dispatch) {
+	  return function () {
+	    return dispatch(actionCreator.apply(undefined, arguments));
+	  };
+	}
+
+	/**
+	 * Turns an object whose values are action creators, into an object with the
+	 * same keys, but with every function wrapped into a `dispatch` call so they
+	 * may be invoked directly. This is just a convenience method, as you can call
+	 * `store.dispatch(MyActionCreators.doSomething())` yourself just fine.
+	 *
+	 * For convenience, you can also pass a single function as the first argument,
+	 * and get a function in return.
+	 *
+	 * @param {Function|Object} actionCreators An object whose values are action
+	 * creator functions. One handy way to obtain it is to use ES6 `import * as`
+	 * syntax. You may also pass a single function.
+	 *
+	 * @param {Function} dispatch The `dispatch` function available on your Redux
+	 * store.
+	 *
+	 * @returns {Function|Object} The object mimicking the original object, but with
+	 * every action creator wrapped into the `dispatch` call. If you passed a
+	 * function as `actionCreators`, the return value will also be a single
+	 * function.
+	 */
+	function bindActionCreators(actionCreators, dispatch) {
+	  if (typeof actionCreators === 'function') {
+	    return bindActionCreator(actionCreators, dispatch);
+	  }
+
+	  if (typeof actionCreators !== 'object' || actionCreators === null) {
+	    throw new Error('bindActionCreators expected an object or a function, instead received ' + (actionCreators === null ? 'null' : typeof actionCreators) + '. ' + 'Did you write "import ActionCreators from" instead of "import * as ActionCreators from"?');
+	  }
+
+	  var keys = Object.keys(actionCreators);
+	  var boundActionCreators = {};
+	  for (var i = 0; i < keys.length; i++) {
+	    var key = keys[i];
+	    var actionCreator = actionCreators[key];
+	    if (typeof actionCreator === 'function') {
+	      boundActionCreators[key] = bindActionCreator(actionCreator, dispatch);
+	    }
+	  }
+	  return boundActionCreators;
+	}
+
+/***/ },
+/* 193 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	exports['default'] = applyMiddleware;
+
+	var _compose = __webpack_require__(194);
+
+	var _compose2 = _interopRequireDefault(_compose);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	/**
+	 * Creates a store enhancer that applies middleware to the dispatch method
+	 * of the Redux store. This is handy for a variety of tasks, such as expressing
+	 * asynchronous actions in a concise manner, or logging every action payload.
+	 *
+	 * See `redux-thunk` package as an example of the Redux middleware.
+	 *
+	 * Because middleware is potentially asynchronous, this should be the first
+	 * store enhancer in the composition chain.
+	 *
+	 * Note that each middleware will be given the `dispatch` and `getState` functions
+	 * as named arguments.
+	 *
+	 * @param {...Function} middlewares The middleware chain to be applied.
+	 * @returns {Function} A store enhancer applying the middleware.
+	 */
+	function applyMiddleware() {
+	  for (var _len = arguments.length, middlewares = Array(_len), _key = 0; _key < _len; _key++) {
+	    middlewares[_key] = arguments[_key];
+	  }
+
+	  return function (createStore) {
+	    return function (reducer, preloadedState, enhancer) {
+	      var store = createStore(reducer, preloadedState, enhancer);
+	      var _dispatch = store.dispatch;
+	      var chain = [];
+
+	      var middlewareAPI = {
+	        getState: store.getState,
+	        dispatch: function dispatch(action) {
+	          return _dispatch(action);
+	        }
+	      };
+	      chain = middlewares.map(function (middleware) {
+	        return middleware(middlewareAPI);
+	      });
+	      _dispatch = _compose2['default'].apply(undefined, chain)(store.dispatch);
+
+	      return _extends({}, store, {
+	        dispatch: _dispatch
+	      });
+	    };
+	  };
+	}
+
+/***/ },
+/* 194 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	exports.__esModule = true;
+	exports["default"] = compose;
+	/**
+	 * Composes single-argument functions from right to left. The rightmost
+	 * function can take multiple arguments as it provides the signature for
+	 * the resulting composite function.
+	 *
+	 * @param {...Function} funcs The functions to compose.
+	 * @returns {Function} A function obtained by composing the argument functions
+	 * from right to left. For example, compose(f, g, h) is identical to doing
+	 * (...args) => f(g(h(...args))).
+	 */
+
+	function compose() {
+	  for (var _len = arguments.length, funcs = Array(_len), _key = 0; _key < _len; _key++) {
+	    funcs[_key] = arguments[_key];
+	  }
+
+	  if (funcs.length === 0) {
+	    return function (arg) {
+	      return arg;
+	    };
+	  }
+
+	  if (funcs.length === 1) {
+	    return funcs[0];
+	  }
+
+	  var last = funcs[funcs.length - 1];
+	  var rest = funcs.slice(0, -1);
+	  return function () {
+	    return rest.reduceRight(function (composed, f) {
+	      return f(composed);
+	    }, last.apply(undefined, arguments));
+	  };
+	}
+
+/***/ },
+/* 195 */
+/***/ function(module, exports) {
+
+	/**
+	 * Copyright 2015, Yahoo! Inc.
+	 * Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
+	 */
+	'use strict';
+
+	var REACT_STATICS = {
+	    childContextTypes: true,
+	    contextTypes: true,
+	    defaultProps: true,
+	    displayName: true,
+	    getDefaultProps: true,
+	    mixins: true,
+	    propTypes: true,
+	    type: true
+	};
+
+	var KNOWN_STATICS = {
+	    name: true,
+	    length: true,
+	    prototype: true,
+	    caller: true,
+	    arguments: true,
+	    arity: true
+	};
+
+	var isGetOwnPropertySymbolsAvailable = typeof Object.getOwnPropertySymbols === 'function';
+
+	module.exports = function hoistNonReactStatics(targetComponent, sourceComponent, customStatics) {
+	    if (typeof sourceComponent !== 'string') { // don't hoist over string (html) components
+	        var keys = Object.getOwnPropertyNames(sourceComponent);
+
+	        /* istanbul ignore else */
+	        if (isGetOwnPropertySymbolsAvailable) {
+	            keys = keys.concat(Object.getOwnPropertySymbols(sourceComponent));
+	        }
+
+	        for (var i = 0; i < keys.length; ++i) {
+	            if (!REACT_STATICS[keys[i]] && !KNOWN_STATICS[keys[i]] && (!customStatics || !customStatics[keys[i]])) {
+	                try {
+	                    targetComponent[keys[i]] = sourceComponent[keys[i]];
+	                } catch (error) {
+
+	                }
+	            }
+	        }
+	    }
+
+	    return targetComponent;
+	};
+
+
+/***/ },
+/* 196 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {/**
+	 * Copyright 2013-2015, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 */
+
+	'use strict';
+
+	/**
+	 * Use invariant() to assert state which your program assumes to be true.
+	 *
+	 * Provide sprintf-style format (only %s is supported) and arguments
+	 * to provide information about what broke and what you were
+	 * expecting.
+	 *
+	 * The invariant message will be stripped in production, but the invariant
+	 * will remain to ensure logic does not differ in production.
+	 */
+
+	var invariant = function(condition, format, a, b, c, d, e, f) {
+	  if (process.env.NODE_ENV !== 'production') {
+	    if (format === undefined) {
+	      throw new Error('invariant requires an error message argument');
+	    }
+	  }
+
+	  if (!condition) {
+	    var error;
+	    if (format === undefined) {
+	      error = new Error(
+	        'Minified exception occurred; use the non-minified dev environment ' +
+	        'for the full error message and additional helpful warnings.'
+	      );
+	    } else {
+	      var args = [a, b, c, d, e, f];
+	      var argIndex = 0;
+	      error = new Error(
+	        format.replace(/%s/g, function() { return args[argIndex++]; })
+	      );
+	      error.name = 'Invariant Violation';
+	    }
+
+	    error.framesToPop = 1; // we don't care about invariant's own frame
+	    throw error;
+	  }
+	};
+
+	module.exports = invariant;
+
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ },
+/* 197 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.addTask = addTask;
+	exports.removeTask = removeTask;
+	exports.editTask = editTask;
+	exports.updateTime = updateTime;
+	exports.setActiveTask = setActiveTask;
+	exports.setInactiveTask = setInactiveTask;
+
+	var _reducerTasks = __webpack_require__(198);
+
+	function addTask(task) {
+	    return {
+	        type: _reducerTasks.ADD_TASK,
+	        payload: task
+	    };
+	}
+
+	function removeTask(taskKey) {
+	    return {
+	        type: _reducerTasks.REMOVE_TASK,
+	        taskKey: taskKey
+	    };
+	}
+
+	function editTask(editedTask) {
+	    return {
+	        type: _reducerTasks.EDIT_TASK,
+	        editedTask: editedTask
+	    };
+	}
+
+	function updateTime(taskKey, newTime) {
+	    return {
+	        type: _reducerTasks.UPDATE_TIME,
+	        taskKey: taskKey,
+	        newTime: newTime
+	    };
+	}
+
+	function setActiveTask(taskKey) {
+	    return {
+	        type: _reducerTasks.SET_ACTIVE_TASK,
+	        taskKey: taskKey
+	    };
+	}
+
+	function setInactiveTask(taskKey) {
+	    return {
+	        type: _reducerTasks.SET_INACTIVE_TASK,
+	        taskKey: taskKey
+	    };
+	}
+
+/***/ },
+/* 198 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+	var ADD_TASK = exports.ADD_TASK = 'ADD_TASK';
+	var REMOVE_TASK = exports.REMOVE_TASK = 'REMOVE_TASK';
+	var EDIT_TASK = exports.EDIT_TASK = 'EDIT_TASK';
+	var UPDATE_TIME = exports.UPDATE_TIME = 'UPDATE_TIME';
+	var SET_ACTIVE_TASK = exports.SET_ACTIVE_TASK = 'SET_ACTIVE_TASK';
+	var SET_INACTIVE_TASK = exports.SET_INACTIVE_TASK = 'SET_INACTIVE_TASK';
+
+	function TasksReducer(state, action) {
+	    if (state === undefined) {
+	        state = [{ description: 'blagh', time: '00:00:00', key: 0, active: false }, { description: 'asdvasdv', time: '00:00:00', key: 1, active: false }, { description: 'avdssvawe', time: '00:00:00', key: 2, active: true }, { description: 'blfadsagh', time: '00:00:00', key: 3, active: false }, { description: 'blagh', time: '00:00:00', key: 4, active: false }];
+	    }
+	    console.log(action.type);
+	    switch (action.type) {
+	        case ADD_TASK:
+	            return [].concat(_toConsumableArray(state), [{
+	                // reduce to get the max key in task list, then add 1 to add to array
+	                key: state.reduce(function (prevMaxKey, curTask) {
+	                    return Math.max(prevMaxKey > 0 ? prevMaxKey : 0, curTask.key);
+	                }) + 1,
+	                description: 'wooo',
+	                time: '00:00:00'
+	            }]);
+	        case REMOVE_TASK:
+	            return state.filter(function (task) {
+	                return task.key !== action.taskKey;
+	            });
+	        case EDIT_TASK:
+	            return state.map(function (task) {
+	                if (task.key === action.editedTask.key) {
+	                    return Object.assign({}, task, {
+	                        time: action.editedTask.time,
+	                        description: action.editedTask.description
+	                    });
+	                }
+	                return task;
+	            });
+	        case UPDATE_TIME:
+	            return state.map(function (task) {
+	                if (task.key == action.taskKey) {
+	                    return Object.assign({}, task, {
+	                        time: action.newTime
+	                    });
+	                }
+	                return task;
+	            });
+	        case SET_ACTIVE_TASK:
+	            return state.map(function (task) {
+	                if (task.key == action.taskKey) {
+	                    return Object.assign({}, task, {
+	                        active: true
+	                    });
+	                }
+	                return Object.assign({}, task, {
+	                    active: false
+	                });
+	            });
+	        case SET_INACTIVE_TASK:
+	            return state.map(function (task) {
+	                if (task.key == action.taskKey) {
+	                    return Object.assign({}, task, {
+	                        active: false
+	                    });
+	                }
+	                return task;
+	            });
+	    }
+	    return state;
+	};
+
+	exports.default = TasksReducer;
+
+/***/ },
+/* 199 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _tocktimer = __webpack_require__(200);
+
+	var _tocktimer2 = _interopRequireDefault(_tocktimer);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Task = function (_React$Component) {
+	    _inherits(Task, _React$Component);
+
+	    function Task(props) {
+	        _classCallCheck(this, Task);
+
+	        var _this = _possibleConstructorReturn(this, (Task.__proto__ || Object.getPrototypeOf(Task)).call(this, props));
+
+	        _this.toggleTimer = _this.toggleTimer.bind(_this);
+	        _this._updateTimeInner = _this._updateTimeInner.bind(_this);
+	        _this._removeTaskInner = _this._removeTaskInner.bind(_this);
+	        _this._setActiveTaskInner = _this._setActiveTaskInner.bind(_this);
+	        _this._setInactiveTaskInner = _this._setInactiveTaskInner.bind(_this);
+	        _this._showTaskEditor = _this._showTaskEditor.bind(_this);
+	        _this._showTaskEditorSelectDescription = _this._showTaskEditorSelectDescription.bind(_this);
+	        _this._showTaskEditorSelectTime = _this._showTaskEditorSelectTime.bind(_this);
+	        _this.startTimer = _this.startTimer.bind(_this);
+	        _this.stopTimer = _this.stopTimer.bind(_this);
+	        _this.startTock = _this.startTock.bind(_this);
+	        _this.state = Object.assign({
+	            tock: new _tocktimer2.default({
+	                callback: _this._updateTimeInner,
+	                interval: 100
+	            })
+	        });
+	        return _this;
+	    }
+
+	    _createClass(Task, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            if (this.props.active) {
+	                this.startTock();
+	            }
+	            this.setState(this.constructTimerState(this.props.active));
+	        }
+	    }, {
+	        key: 'componentWillReceiveProps',
+	        value: function componentWillReceiveProps(props) {
+	            if (!props.active && this.state.timerRunning) {
+	                this.stopTimer();
+	            }
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            return _react2.default.createElement(
+	                'div',
+	                null,
+	                _react2.default.createElement(
+	                    'h2',
+	                    { onClick: this._showTaskEditorSelectDescription },
+	                    this.props.description
+	                ),
+	                _react2.default.createElement(
+	                    'div',
+	                    { onClick: this._showTaskEditorSelectTime },
+	                    this.props.time
+	                ),
+	                _react2.default.createElement(
+	                    'button',
+	                    { onClick: this.toggleTimer },
+	                    this.state.buttonText
+	                ),
+	                _react2.default.createElement(
+	                    'button',
+	                    { onClick: this._showTaskEditor },
+	                    'Edit'
+	                ),
+	                _react2.default.createElement(
+	                    'button',
+	                    { onClick: this._removeTaskInner },
+	                    'Remove Task'
+	                )
+	            );
+	        }
+	    }, {
+	        key: '_removeTaskInner',
+	        value: function _removeTaskInner() {
+	            this.props._removeTask(this.props.itemID);
+	        }
+	    }, {
+	        key: '_showTaskEditor',
+	        value: function _showTaskEditor() {
+	            this.stopTimer();
+	            this.props.showTaskEditor(this.props.itemID);
+	        }
+	    }, {
+	        key: '_showTaskEditorSelectDescription',
+	        value: function _showTaskEditorSelectDescription() {
+	            this.stopTimer();
+	            this.props.showTaskEditor(this.props.itemID, 'description');
+	        }
+	    }, {
+	        key: '_showTaskEditorSelectTime',
+	        value: function _showTaskEditorSelectTime() {
+	            this.stopTimer();
+	            this.props.showTaskEditor(this.props.itemID, 'time');
+	        }
+	    }, {
+	        key: '_updateTimeInner',
+	        value: function _updateTimeInner() {
+	            var tockObj = this.state.tock;
+	            var newTime = tockObj.msToTimecode(tockObj.lap());
+	            this.props._updateTime(this.props.itemID, newTime);
+	        }
+	    }, {
+	        key: '_setActiveTaskInner',
+	        value: function _setActiveTaskInner() {
+	            this.props._setActiveTask(this.props.itemID);
+	        }
+	    }, {
+	        key: '_setInactiveTaskInner',
+	        value: function _setInactiveTaskInner() {
+	            this.props._setInactiveTask(this.props.itemID);
+	        }
+	    }, {
+	        key: 'toggleTimer',
+	        value: function toggleTimer() {
+	            if (!this.state.timerRunning) {
+	                this.startTimer();
+	            } else {
+	                this.stopTimer();
+	            }
+	        }
+	    }, {
+	        key: 'startTock',
+	        value: function startTock() {
+	            this.state.tock.start(this.props.time);
+	        }
+	    }, {
+	        key: 'startTimer',
+	        value: function startTimer() {
+	            this.startTock();
+	            this._setActiveTaskInner();
+	            this.setState(this.constructTimerState(true));
+	        }
+	    }, {
+	        key: 'stopTimer',
+	        value: function stopTimer() {
+	            // needs check for safety cos .pause can unpause
+	            this.state.tock.stop();
+	            this.setState(this.constructTimerState(false));
+	            this._setInactiveTaskInner();
+	        }
+
+	        // necessary for injection into initial constructor state before component is mounted
+
+	    }, {
+	        key: 'constructTimerState',
+	        value: function constructTimerState(timerIsOn) {
+	            return {
+	                buttonText: timerIsOn ? 'Stop' : 'Start',
+	                timerRunning: timerIsOn
+	            };
+	        }
+	    }]);
+
+	    return Task;
+	}(_react2.default.Component);
+
+	Task.propTypes = {
+	    active: _react2.default.PropTypes.bool.isRequired,
+	    _removeTask: _react2.default.PropTypes.func.isRequired,
+	    _updateTime: _react2.default.PropTypes.func.isRequired,
+	    showTaskEditor: _react2.default.PropTypes.func.isRequired,
+	    _setActiveTask: _react2.default.PropTypes.func.isRequired,
+	    _setInactiveTask: _react2.default.PropTypes.func.isRequired,
+	    description: _react2.default.PropTypes.string.isRequired,
+	    time: _react2.default.PropTypes.string.isRequired,
+	    itemID: _react2.default.PropTypes.number.isRequired
+	};
+
+	exports.default = Task;
+
+/***/ },
+/* 200 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
+	* Tock by Mr Chimp - github.com/mrchimp/tock
+	* Based on code by James Edwards:
+	*    sitepoint.com/creating-accurate-timers-in-javascript/
+	*/
+
+	// Implements Date.now() for ie lt 9
+	Date.now = Date.now || function() { return +new Date(); };
+
+	// Polyfills Function.prototype.bind for IE lt 9 and Safari lt 5.1
+	if ( typeof Function.prototype.bind != 'function' ) {
+	    Function.prototype.bind = function (ctx) {
+	        var args = Array.prototype.slice.call(arguments, 1),
+	            fn = this;
+	        return function () {
+	            args.push.apply(args, arguments);
+	            return fn.apply(ctx, args);
+	        };
+	    };
+	}
+
+	(function (root, factory) {
+	  if ( true ) {
+	    !(__WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	  } else if ( typeof exports === 'object' ) {
+	    module.exports = factory();
+	  } else {
+	    root.Tock = factory();
+	  }
+	}(this, function () {
+
+	  /**
+	   * Called every tick for countdown clocks.
+	   * i.e. once every this.interval ms
+	   */
+	  function _tick () {
+	    this.time += this.interval;
+
+	    if ( this.countdown && (this.duration_ms - this.time < 0) ) {
+	      this.final_time = 0;
+	      this.go = false;
+	      this.callback(this);
+	      clearTimeout(this.timeout);
+	      this.complete(this);
+	      return;
+	    } else {
+	      this.callback(this);
+	    }
+
+	    var diff = (Date.now() - this.start_time) - this.time,
+	        next_interval_in = diff > 0 ? this.interval - diff : this.interval;
+
+	    if ( next_interval_in <= 0 ) {
+	      this.missed_ticks = Math.floor(Math.abs(next_interval_in) / this.interval);
+	      this.time += this.missed_ticks * this.interval;
+
+	      if ( this.go ) {
+	        _tick.call(this);
+	      }
+	    } else if ( this.go ) {
+	      this.timeout = setTimeout(_tick.bind(this), next_interval_in);
+	    }
+	  }
+
+	  /**
+	   * Called by Tock internally - use start() instead
+	   */
+	  function _startCountdown (duration) {
+	    this.duration_ms = duration;
+	    this.start_time = Date.now();
+	    this.time = 0;
+	    this.go = true;
+	    _tick.call(this);
+	  }
+
+	  /**
+	   * Called by Tock internally - use start() instead
+	   */
+	  function _startTimer (start_offset) {
+	    this.start_time = start_offset || Date.now();
+	    this.time = 0;
+	    this.go = true;
+	    _tick.call(this);
+	  }
+
+	  var MILLISECONDS_RE           = /^\s*(\+|-)?\d+\s*$/,
+	      MM_SS_RE                  = /^(\d{1,2}):(\d{2})$/,
+	      MM_SS_ms_OR_HH_MM_SS_RE   = /^(\d{1,2}):(\d{2})(?::|\.)(\d{2,3})$/,
+	      MS_PER_HOUR               = 3600000,
+	      MS_PER_MIN                = 60000,
+	      MS_PER_SEC                = 1000,
+	      /* The RegExp below will match a date in format `yyyy-mm-dd HH:MM:SS` and optionally with `.ms` at the end.
+	       * It will also match ISO date string, i.e. if the whitespace separator in the middle is replaced with a `T`
+	       * and the date string is also suffixed with a `Z` denoting UTC timezone.
+	       */
+	      yyyy_mm_dd_HH_MM_SS_ms_RE = /^(\d{4})-([0-1]\d)-([0-3]\d)(?:\s|T)(\d{2}):(\d{2}):(\d{2})(?:\.(\d{3})Z?)?$/;
+
+	  var Tock = function (options) {
+	    options = options || {};
+
+	    if ( ! (this instanceof Tock) ) return new Tock(options);
+
+	    Tock.instances = (Tock.instances || 0) + 1;
+
+	    this.go           = false;
+	    this.timeout      = null;
+	    this.missed_ticks = null;
+	    this.interval     = options.interval || 10;
+	    this.countdown    = options.countdown || false;
+	    this.start_time   = 0;
+	    this.pause_time   = 0;
+	    this.final_time   = 0;
+	    this.duration_ms  = 0;
+	    this.time         = 0;
+	    this.callback     = options.callback || function () {};
+	    this.complete     = options.complete || function () {};
+	  };
+
+	  /**
+	   * Reset the clock
+	   */
+	  Tock.prototype.reset = function () {
+	    if ( this.countdown ) {
+	      return false;
+	    }
+
+	    this.stop();
+	    this.start_time = 0;
+	    this.time = 0;
+	  };
+
+	  /**
+	   * Start the clock.
+	   * @param {Various} time Accepts a single "time" argument
+	   *   which can be in various forms:
+	   *   - MM:SS
+	   *   - MM:SS:ms or MM:SS.ms
+	   *   - HH:MM:SS
+	   *   - yyyy-mm-dd HH:MM:SS.ms
+	   *   - milliseconds
+	   */
+	  Tock.prototype.start = function (time) {
+	    if (this.go) return false;
+
+	    time = time ? this.timeToMS(time) : 0;
+
+	    this.start_time = time;
+	    this.pause_time = 0;
+
+	    if ( this.countdown ) {
+	      _startCountdown.call(this, time);
+	    } else {
+	      _startTimer.call(this, Date.now() - time);
+	    }
+	  };
+
+	  /**
+	   * Stop the clock and clear the timeout
+	   */
+	  Tock.prototype.stop = function () {
+	    this.pause_time = this.lap();
+	    this.go = false;
+
+	    clearTimeout(this.timeout);
+
+	    if ( this.countdown ) {
+	      this.final_time = this.duration_ms - this.time;
+	    } else {
+	      this.final_time = (Date.now() - this.start_time);
+	    }
+	  };
+
+	  /**
+	   * Stop/start the clock.
+	   */
+	  Tock.prototype.pause = function () {
+	    if ( this.go ) {
+	      this.pause_time = this.lap();
+	      this.stop();
+	    } else {
+	      if ( this.pause_time ) {
+	        if ( this.countdown ) {
+	          _startCountdown.call(this, this.pause_time);
+	        } else {
+	          _startTimer.call(this, Date.now() - this.pause_time);
+	        }
+
+	        this.pause_time = 0;
+	      }
+	    }
+	  };
+
+	  /**
+	   * Get the current clock time in ms.
+	   * Use with Tock.msToTime() to make it look nice.
+	   * @return {Integer} Number of milliseconds ellapsed/remaining
+	   */
+	  Tock.prototype.lap = function () {
+	    if ( this.go ) {
+	      var now;
+
+	      if ( this.countdown ) {
+	        now = this.duration_ms - (Date.now() - this.start_time);
+	      } else {
+	        now = (Date.now() - this.start_time);
+	      }
+
+	      return now;
+	    }
+
+	    return this.pause_time || this.final_time;
+	  };
+
+	  /**
+	   * Format milliseconds as a MM:SS.ms string.
+	   * @param  {Integer} ms Number of milliseconds
+	   * @return {String}     String representation of ms in format MM:SS:ms
+	   */
+	  Tock.prototype.msToTime = function (ms) {
+	    var milliseconds = this.zeroPad(ms % MS_PER_SEC, 3),
+	        seconds = this.zeroPad(Math.floor((ms / MS_PER_SEC) % 60), 2),
+	        minutes = this.zeroPad(Math.floor((ms / (MS_PER_MIN)) % 60), 2);
+
+	    return minutes + ':' + seconds + '.' + milliseconds;
+	  };
+
+	  /**
+	   * Pad the left side of a string with zeros up to a given length. I
+	   * considered using an NPM package for this but it's probably best not to.
+	   * @param  {Various} input  Number to pad. Will be converted to string.
+	   * @param  {Integer} length Desired string length
+	   * @return {String}         Padding number
+	   */
+	  Tock.prototype.zeroPad = function (input, length) {
+	    input = input.toString();
+
+	    while ( input.length < length ) {
+	      input = '0' + input;
+	    }
+
+	    return input;
+	  };
+
+	  /**
+	   * Format milliseconds as HH:MM:SS or HH:MM:SS:mmm
+	   * @param  {Integer} ms      Number of milliseconds
+	   * @param  {Boolean} show_ms If true, include milliseconds in output
+	   * @return {String}          Formatted timecode string
+	   */
+	  Tock.prototype.msToTimecode = function (ms, show_ms) {
+	    var seconds  = this.zeroPad(Math.floor((ms / MS_PER_SEC)  % 60), 2),
+	        minutes  = this.zeroPad(Math.floor((ms / MS_PER_MIN)  % 60), 2),
+	        hours    = this.zeroPad(Math.floor((ms / MS_PER_HOUR) % 60), 2),
+	        millisec = (show_ms ? ':' + this.zeroPad(Math.floor(ms % MS_PER_SEC), 3) : '');
+
+	    return hours + ':' + minutes + ':' + seconds + millisec;
+	  };
+
+	  /**
+	   * Convert a time string to milliseconds
+	   *
+	   * Possible inputs:
+	   * MM:SS
+	   * MM:SS:ms or MM:SS.ms
+	   * HH:MM:SS
+	   * yyyy-mm-dd HH:MM:SS.ms
+	   *
+	   * A milliseconds input will return it back for safety
+	   * If the input cannot be recognized then 0 is returned
+	   */
+	  Tock.prototype.timeToMS = function (time) {
+	    // If input is milliseconds integer then return it back
+	    if ( MILLISECONDS_RE.test(String(time)) ) {
+	      return time;
+	    }
+
+	    var ms,
+	        time_split,
+	        match,
+	        date,
+	        now = new Date();
+
+	    if ( MM_SS_RE.test(time) ) { // If MM:SS
+	      time_split = time.split(':');
+	      ms = parseInt(time_split[0], 10) * MS_PER_MIN;
+	      ms += parseInt(time_split[1], 10) * MS_PER_SEC;
+	    } else {
+	      match = time.match(MM_SS_ms_OR_HH_MM_SS_RE);
+
+	      if ( match ) {
+	        if ( match[3].length == 3 || parseInt(match[3], 10) > 59 ) { // If MM:SS:ms or MM:SS.ms (e.g. 10:10:458 or 10:10.458)
+	          ms = parseInt(match[1], 10) * MS_PER_MIN;
+	          ms += parseInt(match[2], 10) * MS_PER_SEC;
+	          ms += parseInt(match[3], 10);
+	        } else { // Then it's HH:MM:SS
+	          ms = parseInt(match[1], 10) * MS_PER_HOUR;
+	          ms += parseInt(match[2], 10) * MS_PER_MIN;
+	          ms += parseInt(match[3], 10) * MS_PER_SEC;
+	        }
+	      } else if ( yyyy_mm_dd_HH_MM_SS_ms_RE.test(time) ) { // If yyyy-mm-dd HH:MM:SS or yyyy-mm-dd HH:MM:SS.ms or yyyy-mm-ddTHH:MM:SS.msZ
+	        date = new Date();
+	        now = new Date();
+
+	        match = time.match(yyyy_mm_dd_HH_MM_SS_ms_RE);
+
+	        date.setYear(match[1]);
+	        date.setMonth(match[2]);
+	        date.setDate(match[3]);
+	        date.setHours(match[4]);
+	        date.setMinutes(match[5]);
+	        date.setSeconds(match[6]);
+
+	        if (typeof match[7] !== 'undefined') {
+	          date.setMilliseconds(match[7]);
+	        }
+
+	        ms = Math.max(0, date.getTime() - now.getTime());
+	      } else {
+	        // Let's try it as a date string
+	        now = new Date();
+	        ms = Date.parse(time);
+
+	        if ( !isNaN(ms) ) { // Looks ok
+	          ms = Math.max(0, ms - now.getTime());
+	        } else { // Could not recognize input, so start from 0
+	          ms = 0;
+	        }
+	      }
+	    }
+
+	    return ms;
+	  };
+
+	  return Tock;
+	}));
+
+
+/***/ },
+/* 201 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var HelloWorld = _react2.default.createClass({
-	    displayName: 'HelloWorld',
-	    render: function render() {
-	        return _react2.default.createElement(
-	            'div',
-	            null,
-	            'Hello World'
-	        );
-	    }
-	});
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	exports.default = HelloWorld;
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var TaskControls = function (_React$Component) {
+	    _inherits(TaskControls, _React$Component);
+
+	    function TaskControls(props) {
+	        _classCallCheck(this, TaskControls);
+
+	        return _possibleConstructorReturn(this, (TaskControls.__proto__ || Object.getPrototypeOf(TaskControls)).call(this, props));
+	    }
+
+	    _createClass(TaskControls, [{
+	        key: 'render',
+	        value: function render() {
+	            return _react2.default.createElement(
+	                'div',
+	                null,
+	                _react2.default.createElement(
+	                    'button',
+	                    { onClick: this.props._addTask },
+	                    'Add Task'
+	                )
+	            );
+	        }
+	    }]);
+
+	    return TaskControls;
+	}(_react2.default.Component);
+
+	exports.default = TaskControls;
 
 /***/ },
-/* 173 */
+/* 202 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var TaskTotals = function (_React$Component) {
+	    _inherits(TaskTotals, _React$Component);
+
+	    function TaskTotals(props) {
+	        _classCallCheck(this, TaskTotals);
+
+	        return _possibleConstructorReturn(this, (TaskTotals.__proto__ || Object.getPrototypeOf(TaskTotals)).call(this, props));
+	    }
+
+	    _createClass(TaskTotals, [{
+	        key: 'render',
+	        value: function render() {
+	            return _react2.default.createElement('div', null);
+	        }
+	    }]);
+
+	    return TaskTotals;
+	}(_react2.default.Component);
+
+	exports.default = TaskTotals;
+
+/***/ },
+/* 203 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _domChecks = __webpack_require__(204);
+
+	var _domChecks2 = _interopRequireDefault(_domChecks);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var TaskEditModal = function (_React$Component) {
+	    _inherits(TaskEditModal, _React$Component);
+
+	    function TaskEditModal(props) {
+	        _classCallCheck(this, TaskEditModal);
+
+	        var _this = _possibleConstructorReturn(this, (TaskEditModal.__proto__ || Object.getPrototypeOf(TaskEditModal)).call(this, props));
+
+	        _this._applyEditsInner = _this._applyEditsInner.bind(_this);
+	        _this._handleDescriptionChangeInner = _this._handleDescriptionChangeInner.bind(_this);
+	        _this._handleTimeChangeInner = _this._handleTimeChangeInner.bind(_this);
+	        _this.focusInput = _this.focusInput.bind(_this);
+	        _this.state = {
+	            taskKey: null
+	        };
+	        return _this;
+	    }
+
+	    _createClass(TaskEditModal, [{
+	        key: 'componentDidUpdate',
+	        value: function componentDidUpdate() {
+	            if (this.props.selectInput && this.props.isVisible) {
+	                this.focusInput();
+	            }
+	        }
+	    }, {
+	        key: 'focusInput',
+	        value: function focusInput() {
+	            if (this.props.selectInput == 'description') {
+	                this.descriptionInput.focus();
+	            } else if (this.props.selectInput == 'time') {
+	                this.timeInput.focus();
+	            }
+	            this.props.inputFocusFinished();
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var _this2 = this;
+
+	            var description = "";
+	            var time = "";
+	            if (this.props.currentEditingTask) {
+	                description = this.props.currentEditingTask.description;
+	                time = this.props.currentEditingTask.time;
+	            }
+	            return _react2.default.createElement(
+	                'form',
+	                { className: this.props.isVisible ? 'task-edit-box' : 'hidden', onSubmit: this._applyEditsInner },
+	                _react2.default.createElement(
+	                    'div',
+	                    null,
+	                    _react2.default.createElement(
+	                        'label',
+	                        { htmlFor: 'description' },
+	                        'Description'
+	                    ),
+	                    _react2.default.createElement('input', { ref: function ref(input) {
+	                            return _this2.descriptionInput = input;
+	                        }, type: 'text', name: 'description', id: 'description', value: description, onChange: this._handleDescriptionChangeInner })
+	                ),
+	                _react2.default.createElement(
+	                    'div',
+	                    null,
+	                    _react2.default.createElement(
+	                        'label',
+	                        { htmlFor: 'time' },
+	                        'Time'
+	                    ),
+	                    _react2.default.createElement('input', { ref: function ref(input) {
+	                            return _this2.timeInput = input;
+	                        }, type: 'text', name: 'time', id: 'time', value: time, onChange: this._handleTimeChangeInner })
+	                ),
+	                _react2.default.createElement(
+	                    'button',
+	                    null,
+	                    'Apply'
+	                ),
+	                _react2.default.createElement(
+	                    'button',
+	                    { onClick: this.props.hideTaskEditor },
+	                    'Close'
+	                )
+	            );
+	        }
+	    }, {
+	        key: '_handleDescriptionChangeInner',
+	        value: function _handleDescriptionChangeInner(event) {
+	            this.setState({
+	                description: event.target.value
+	            });
+	        }
+	    }, {
+	        key: '_handleTimeChangeInner',
+	        value: function _handleTimeChangeInner(event) {
+	            this.props.handleTimeChange(event.target.value);
+	        }
+	    }, {
+	        key: '_handleDescriptionChangeInner',
+	        value: function _handleDescriptionChangeInner(event) {
+	            this.props.handleDescriptionChange(event.target.value);
+	        }
+	    }, {
+	        key: '_applyEditsInner',
+	        value: function _applyEditsInner(event) {
+	            event.preventDefault();
+	            this.props._applyEdits();
+	        }
+	    }]);
+
+	    return TaskEditModal;
+	}(_react2.default.Component);
+
+	exports.default = TaskEditModal;
+
+/***/ },
+/* 204 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = waitToRender;
+	//store a this ref, and
+	function waitToRender(reactComponent, callback) {
+	    window.requestAnimationFrame(function () {
+	        var node = reactComponent.getDOMNode();
+	        if (node !== undefined) {
+	            callback();
+	        }
+	    });
+	}
+
+/***/ },
+/* 205 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _redux = __webpack_require__(180);
+
+	var _reducerTasks = __webpack_require__(198);
+
+	var _reducerTasks2 = _interopRequireDefault(_reducerTasks);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var RootReducer = (0, _redux.combineReducers)({
+	    tasks: _reducerTasks2.default
+	});
+
+	exports.default = RootReducer;
+
+/***/ },
+/* 206 */
 /***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin

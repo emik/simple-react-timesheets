@@ -1,4 +1,5 @@
 import React from 'react';
+import waitToRender from '../utility/dom-checks.jsx';
 
 class TaskEditModal extends React.Component {
 
@@ -7,34 +8,43 @@ class TaskEditModal extends React.Component {
         this._applyEditsInner = this._applyEditsInner.bind(this);
         this._handleDescriptionChangeInner = this._handleDescriptionChangeInner.bind(this);
         this._handleTimeChangeInner = this._handleTimeChangeInner.bind(this);
+        this.focusInput = this.focusInput.bind(this);
         this.state = {
             taskKey: null
         };
     }
 
-    componentWillReceiveProps(props) {
-        // set timeout super hacky fix to avoid timing issues associated with showing the box and then focusing, 
-        // and possibly conflicts with the timer
-        setTimeout(()=>{
-            if(props.selectInput == 'description') {
-                this.descriptionInput.focus();
-            }else if(props.selectInput == 'time') {
-                this.timeInput.focus();
-            }
-            props.inputFocusFinished();
-        }, 10);
+    componentDidUpdate() {
+        if(this.props.selectInput && this.props.isVisible) {
+            this.focusInput();
+        }
+    }
+
+    focusInput() {
+        if(this.props.selectInput == 'description') {
+            this.descriptionInput.focus();
+        }else if(this.props.selectInput == 'time') {
+            this.timeInput.focus()
+        }
+        this.props.inputFocusFinished();
     }
 
     render() {
+        let description = "";
+        let time = "";
+        if(this.props.currentEditingTask) {
+            description = this.props.currentEditingTask.description;
+            time = this.props.currentEditingTask.time;
+        }
         return (
-            <form onSubmit={this._applyEditsInner}>
+            <form className={this.props.isVisible ? 'task-edit-box' : 'hidden'} onSubmit={this._applyEditsInner}>
                 <div>
                     <label htmlFor="description">Description</label>
-                    <input ref={(input) => this.descriptionInput = input} type="text" name="description" id="description" value={this.props.currentEditingTask.description} onChange={this._handleDescriptionChangeInner} />
+                    <input ref={(input) => this.descriptionInput = input} type="text" name="description" id="description" value={description} onChange={this._handleDescriptionChangeInner} />
                 </div>
                 <div>
                     <label htmlFor="time">Time</label>
-                    <input ref={(input) => this.timeInput = input} type="text" name="time" id="time" value={this.props.currentEditingTask.time} onChange={this._handleTimeChangeInner} />
+                    <input ref={(input) => this.timeInput = input} type="text" name="time" id="time" value={time} onChange={this._handleTimeChangeInner} />
                 </div>
                 <button>Apply</button>
                 <button onClick={this.props.hideTaskEditor}>Close</button>
