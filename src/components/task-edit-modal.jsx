@@ -1,5 +1,4 @@
 import React from 'react';
-import waitToRender from '../utility/dom-checks.jsx';
 
 class TaskEditModal extends React.Component {
 
