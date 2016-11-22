@@ -44,7 +44,7 @@ class Task extends React.Component {
                 <h2 onClick={this._showTaskEditorSelectDescription}>{this.props.description}</h2>
                 <div onClick={this._showTaskEditorSelectTime}>{this.props.time}</div>
                 <button onClick={this.toggleTimer}>{this.state.buttonText}</button>
-                <button onClick={this._showTaskEditor}>Edit</button>
+                <button onClick={this._showTaskEditorSelectDescription}>Edit</button>
                 <button onClick={this._removeTaskInner}>Remove Task</button>
             </div>
         );
@@ -54,6 +54,7 @@ class Task extends React.Component {
         this.props._removeTask(this.props.itemID);
     }
 
+    // unused
     _showTaskEditor() {
         this.stopTimer();
         this.props.showTaskEditor(this.props.itemID);
