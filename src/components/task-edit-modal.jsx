@@ -67,7 +67,29 @@ class TaskEditModal extends React.Component {
 
     _applyEditsInner(event) {
         event.preventDefault();
+
+        // validation
+        if(!this.isValidDescription(this.props.currentEditingTask.description)) {
+            alert('description needs to be filled');
+            return false;
+        }
+        if(!this.isValidTime(this.props.currentEditingTask.time)) {
+            alert('time needs to be filled');
+            return false;
+        }
         this.props._applyEdits();
+    }
+
+    isValidDescription(description) {
+        return typeof description === 'string' && description.length > 0; 
+    }
+
+    isValidTime(time) {
+        if(typeof time !== 'string' || !time) {
+            return false;
+        }
+        let timeMatch = time.match(/[0-9][0-9]:[0-9][0-9]:[0-9][0-9]/);
+        return typeof timeMatch === 'object' && timeMatch.length === 1 && time.length === 8;
     }
 }
 
